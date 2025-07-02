@@ -6,7 +6,7 @@ import numpy as np
 import casadi_kin_dyn.py3casadi_kin_dyn as casadi_kin_dyn
 from xbot_interface import config_options as co
 from xbot_interface import xbot_interface as xbot
-import scipy
+import scipy.io as sio
 import time
 import argparse
 
@@ -242,7 +242,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     print(f"Data from file: {args.file}")
-    data = scipy.io.loadmat(args.file)
+    data = sio.loadmat(args.file)
 
     fixed_joint_map = {'shoulder_yaw_1': 0.0,
                        'shoulder_pitch_1': np.pi / 2,
