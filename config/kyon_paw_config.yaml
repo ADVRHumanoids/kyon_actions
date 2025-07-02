@@ -1,0 +1,98 @@
+horizon_duration: 15.0
+n_nodes: 300
+
+fixed_joints:
+    shoulder_yaw_1: 0.0
+    shoulder_pitch_1: 1.57
+    elbow_pitch_1: 0.
+    wrist_pitch_1: 0.
+    wrist_yaw_1: 0.
+    shoulder_yaw_2: 0.0
+    shoulder_pitch_2: -1.57
+    elbow_pitch_2: 0.
+    wrist_pitch_2: 0.
+    wrist_yaw_2: 0.
+    dagana_1_clamp_joint: 0
+    dagana_2_clamp_joint: 0
+#    ankle_yaw_1: 0.
+#    ankle_yaw_2: 0.
+#    ankle_yaw_3: 0.
+#    ankle_yaw_4: 0.
+
+#control_mode:
+#    wheel_joint_1: 26
+#    wheel_joint_2: 26
+#    wheel_joint_3: 26
+#    wheel_joint_4: 26
+
+define:
+   - &high_stiff 2000.
+   - &high_damp 20.
+   - &low_stiff 100.
+   - &low_damp 10.
+    # - &low_stiff 1000.
+    # - &low_damp 50.
+
+stiffness:
+    hip_roll_1: *high_stiff
+    hip_pitch_1: *high_stiff
+    knee_pitch_1: *high_stiff
+    hip_roll_2: *high_stiff
+    hip_pitch_2: *high_stiff
+    knee_pitch_2: *high_stiff
+    hip_roll_3: *high_stiff
+    hip_pitch_3: *high_stiff
+    knee_pitch_3: *high_stiff
+    hip_roll_4: *high_stiff
+    hip_pitch_4: *high_stiff
+    knee_pitch_4: *high_stiff
+#    ankle_yaw_1: *high_stiff
+#    ankle_yaw_2: *high_stiff
+#    ankle_yaw_3: *high_stiff
+#    ankle_yaw_4: *high_stiff
+#    shoulder_yaw_1: 100
+#    shoulder_pitch_1: 100
+#    elbow_pitch_1: 100
+#    wrist_pitch_1: 50
+#    wrist_yaw_1: 50
+#    shoulder_yaw_2: 100
+#    shoulder_pitch_2: 100
+#    elbow_pitch_2: 100
+#    wrist_pitch_2: 50
+#    wrist_yaw_2: 50
+#    wheel_joint_1: 0
+#    wheel_joint_2: 0
+#    wheel_joint_3: 0
+#    wheel_joint_4: 0
+
+damping:
+    hip_roll_1: *high_damp
+    hip_pitch_1: *high_damp
+    knee_pitch_1: *high_damp
+    hip_roll_2: *high_damp
+    hip_pitch_2: *high_damp
+    knee_pitch_2: *high_damp
+    hip_roll_3: *high_damp
+    hip_pitch_3: *high_damp
+    knee_pitch_3: *high_damp
+    hip_roll_4: *high_damp
+    hip_pitch_4: *high_damp
+    knee_pitch_4: *high_damp
+#    ankle_yaw_1: *high_damp
+#    ankle_yaw_2: *high_damp
+#    ankle_yaw_3: *high_damp
+#    ankle_yaw_4: *high_damp
+#    shoulder_yaw_1: 5
+#    shoulder_pitch: 5
+#    elbow_pitch_1: 5
+#    wrist_pitch_1: 5
+#    wrist_yaw_1: 5
+#    shoulder_yaw_2: 5
+#    shoulder_pitch: 5
+#    elbow_pitch_2: 5
+#    wrist_pitch_2: 5
+#    wrist_yaw_2: 5
+#    wheel_joint_1: 10
+#    wheel_joint_2: 10
+#    wheel_joint_3: 10
+#    wheel_joint_4: 10
