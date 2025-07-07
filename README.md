@@ -25,12 +25,12 @@ forest grow kyon_actions
 
 ## Check Information of the Bag File
 
-To inspect the `.mat` file:
+To inspect the `.mat` file containing the optimization output for the desired action, ready to be replayed on the robot:
 
 ```bash
+cd kyon_actions/
 python3 replayer.py -f mat_files/action_paw.mat info
 ```
-The mat file contains the optimization output for the desired action, ready to be replayed on the roboy.
 
 ---
 
