@@ -8,7 +8,7 @@ This README provides instructions for setting up and using the `kyon_actions` pa
 
 ```bash
 cd /xbot2_ws/recipes/multidof_recipes/recipes  
-git pull origin kyon_cetc
+git pull origin kyon-cetc
 ```
 
 ---
