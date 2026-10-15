@@ -90,35 +90,8 @@ python3 -m unittest test_replay_sim_ros2 -v
 
 ## Real robot with ROS 2
 
-The launcher above is simulation-only. It creates its own robot description,
-starts XBot with `-H mj -S`, and uses an initial MuJoCo keyframe instead of robot
-homing. Hardware replay has not been implemented for this ROS 2 branch.
+Follow [REAL_ROBOT.md](REAL_ROBOT.md) for the numbered hardware workflow,
+inspection commands, and feedback recording commands.
 
-The real-robot sequence remains: start the robot's normal XBot hardware stack,
-home to the first trajectory posture, start a replay-only controller, and stream
-the trajectory while recording joint feedback. A ROS 2 hardware replayer is not
-implemented yet. It must use the robot's live descriptions and calibrated joint
-modes/gains, wall time, measured-state homing, and a controlled stop on lost or
-invalid data. The current controller keeps sending the last position, velocity,
-and torque references after the trajectory publisher disappears; its replay
-input has no stale-message timeout.
-
-On the robot's normal sourced ROS 2 terminal, these commands only inspect state:
-
-```bash
-echo "$ROS_DISTRO"
-ros2 node list
-ros2 topic info /xbotcore/joint_states --verbose
-ros2 topic echo /xbotcore/joint_states --once
-ros2 topic info /mpc_solution --verbose
-```
-
-Use the robot's configured ROS domain. The isolated simulation domain 77 is not
-a hardware setting. The general `controller.launch.py` also starts `mpc_cpp`,
-which is another source of `/mpc_solution`; it is not a replay-only launch.
-
-The hardware startup command and XBot YAML are required to prepare and validate
-the ROS 2 hardware entry point. Begin hardware validation without the payload,
-using the robot team's established support and stop procedure, before attempting
-the loaded step-up. Simulation completion alone does not validate the current
-30 kg replay for hardware, given the measured tracking error and torque saturation.
+Hardware homing and replay are not implemented yet. The guide marks those steps
+explicitly and explains which robot configuration is needed to complete them.
