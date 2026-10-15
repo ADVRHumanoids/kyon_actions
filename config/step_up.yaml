@@ -1,0 +1,27 @@
+stiffness:
+  hip_roll_1: 2000.0
+  hip_pitch_1: 2000.0
+  knee_pitch_1: 2000.0
+  hip_roll_2: 2000.0
+  hip_pitch_2: 2000.0
+  knee_pitch_2: 2000.0
+  hip_roll_3: 2000.0
+  hip_pitch_3: 2000.0
+  knee_pitch_3: 2000.0
+  hip_roll_4: 2000.0
+  hip_pitch_4: 2000.0
+  knee_pitch_4: 2000.0
+
+damping:
+  hip_roll_1: 20.0
+  hip_pitch_1: 20.0
+  knee_pitch_1: 20.0
+  hip_roll_2: 20.0
+  hip_pitch_2: 20.0
+  knee_pitch_2: 20.0
+  hip_roll_3: 20.0
+  hip_pitch_3: 20.0
+  knee_pitch_3: 20.0
+  hip_roll_4: 20.0
+  hip_pitch_4: 20.0
+  knee_pitch_4: 20.0
