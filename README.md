@@ -93,6 +93,24 @@ python3 -m unittest test_replay_sim_ros2 -v
 Follow [REAL_ROBOT.md](REAL_ROBOT.md) for the numbered hardware workflow,
 inspection commands, and feedback recording commands.
 
-The existing controller is exposed through `controller_step_up.launch.py`, with
-required controller/model YAML paths. The standalone ROS 2 homing and MAT replay
-command still needs porting; the tracking controller itself is already available.
+After starting the robot's normal XBot stack, the ROS 2 equivalent of the old
+homing → controller → replay sequence is:
+
+```bash
+ros2 run kyon_actions replayer_ros2.py homing
+# Separate terminal; substitute the robot's calibrated controller YAML:
+ros2 launch kyon_actions controller_step_up.launch.py config:=/path/to/robot_controller.yaml
+# After the controller starts:
+ros2 run kyon_actions replayer_ros2.py replay
+```
+
+The default file is `step_up_clearance.mat`; use `-f /path/to/file.mat` for another
+trajectory. `info` prints the initial joint posture without connecting to XBot.
+Both homing and replay save measured positions, velocities, applied efforts,
+and references to CSV. Homing preserves the existing gains. Replay uses zero
+feedforward torque, as in the tested leg-only simulation.
+
+The controller-only launch enables a 0.5 s wall-time command timeout. The latest
+`kyon_controller` build is required; the replayer checks for this timeout before
+publishing. These commands and publisher-loss handling were exercised against
+MuJoCo. Physical robot validation remains outstanding; see the hardware guide.

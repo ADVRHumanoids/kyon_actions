@@ -1,8 +1,9 @@
 # Real robot: ROS 2 step-up workflow
 
-**Status: the ROS 2 controller exists and the MAT publisher works in simulation.
-The standalone hardware homing/replay command still needs porting.** The simulation
-launcher starts MuJoCo and cannot be used as the hardware entry point.
+**Status: the standalone ROS 2 `info`, `homing`, and `replay` commands are
+implemented and tested against MuJoCo. Physical robot validation is outstanding.**
+The simulation launcher starts MuJoCo; use the standalone commands below with
+the robot’s normal XBot stack.
 
 ## 1. Open the robot's normal ROS 2 terminal
 
@@ -19,9 +20,11 @@ ros2 pkg prefix kyon_controller
 ros2 pkg executables kyon_actions
 ```
 
-Currently, the actions package exposes `replay_sim_ros2.py` and
-`plot_experiment.py`. These do not include a hardware replayer. Do not set domain
-77 solely because it was used by the isolated simulation container.
+The actions package exposes `replayer_ros2.py` for the live XBot stack,
+`replay_sim_ros2.py` for the full simulation pipeline, and `plot_experiment.py`.
+Build and install the latest `kyon_controller` as well: its command-timeout
+parameter is required for standalone replay. Do not set domain 77 solely because
+it was used by the isolated simulation container.
 
 ## 2. Start the normal XBot hardware stack
 
@@ -74,53 +77,75 @@ Ctrl+C in this terminal stops the recording. It does not stop the robot.
 The automatic PDF currently consumes simulation `telemetry.npz`; conversion of
 hardware recordings into that report is not implemented yet.
 
-## 5. Home the 12 leg joints to the trajectory's initial posture
+## 5. Home the 12 leg joints to the MAT file's initial posture
 
-A hardware homing command must interpolate the 12 measured leg joint positions
-to `q[7:, 0]` from the MAT file, using the robot's calibrated modes and gains.
-There are no arm/gripper targets. The first seven entries describe the floating
-base and are not joint homing targets.
-It must verify measured convergence before replay starts. The simulation's
-initial keyframe places the robot directly into its start state and is not a
-hardware homing procedure.
+Inspect the default trajectory without connecting to the robot:
 
-There is no ROS 2 hardware homing command in this package yet. The ROS 1
-implementation on `master` assumes arm/gripper joints and a different interface.
+```bash
+ros2 run kyon_actions replayer_ros2.py info
+```
 
-## 6. Start the existing ROS 2 controller, then publish the MAT trajectory
+The default is `step_up_clearance.mat`. Add `-f /path/to/trajectory.mat` to every
+command below to use another file.
 
-The controller is already implemented in `kyon_controller` and is the same one
-used by the simulation pipeline. The old ROS 1 `controller_step_up.launch` only
-started that controller; the ROS 1 `replayer.py` provided the separate `homing`
-and `replay` modes.
+Run homing before starting the replay controller:
 
-The equivalent ROS 2 controller-only launch is now available:
+```bash
+ros2 run kyon_actions replayer_ros2.py homing --output homing_feedback.csv
+```
+
+This interpolates the 12 measured leg joint positions to `q[7:, 0]` over five
+seconds, preserves the current gains, and verifies the final measured error is
+within 0.05 rad. The first seven MAT entries describe the floating base; there
+are no arm or gripper targets. Every homing command has zero velocity and effort
+references. `--duration` changes the homing time; `--position-tolerance` sets the
+measured convergence tolerance in radians.
+
+The replayer reads the live URDF and feedback, checks the model/joint limits,
+requires a stationary robot and a single command publisher, and rejects stale
+feedback. It does not start XBot or replace its robot description.
+
+## 6. Start the existing controller, then replay
+
+In a separate sourced terminal, start the existing controller with the robot's
+calibrated controller YAML:
 
 ```bash
 ros2 launch kyon_actions controller_step_up.launch.py \
-  config:=/absolute/path/to/robot_controller.yaml \
-  mpc_config:=/absolute/path/to/replay_model.yaml
+  config:=/absolute/path/to/robot_controller.yaml
 ```
 
-Replace the paths with the verified hardware controller configuration and replay
-model configuration. `config` supplies joint gains/modes; `mpc_config` supplies
-`n_nodes`, `dt`, and `model.fixed_joint_map`. Both files are required. The launch
-uses the live XBot robot descriptions and wall time, and starts no MPC publisher.
-Launch it after homing with the correct hardware configuration: controller
-initialization changes joint control modes.
+Replace the path with the verified hardware gains/modes YAML. This starts only
+`kyon_controller`, uses the live XBot robot descriptions and wall time, and
+initializes joint control modes. The default `mpc_config` is the installed
+`config/replay_model.yaml`, containing a one-interval replay model with no fixed
+arm joints. Override it with `mpc_config:=/path/to/replay_model.yaml` if needed.
+The controller loop defaults to 500 Hz.
 
-The remaining port is the standalone ROS 2 equivalent of the old replayer's two
-modes: measured-state homing, followed by wall-time publishing of the saved
-`WBTrajectory` samples on `/mpc_solution`. The simulation replayer already
-publishes that ROS 2 message; its simulator startup, initial keyframe, `/clock`,
-and simulator-only feedback dependencies must be separated from the hardware
-entry point. No new tracking controller is needed.
+After it starts, run the MAT publisher in the previous terminal:
 
-Completion/interruption handling also needs attention: the current controller
-continues sending the last position, velocity, and torque
-references after its publisher disappears. Stopping the publisher with Ctrl+C
-does not provide a controlled robot stop. Validate the stop behavior using the
-robot team's established support and stop procedure before a motion trial.
+```bash
+ros2 run kyon_actions replayer_ros2.py replay --output replay_feedback.csv
+```
+
+The publisher requires the measured initial joint posture to be within the same
+0.05 rad tolerance. It interpolates the saved joint references at 200 Hz using
+wall time. Saved full-body feedforward torques are disabled, matching the tested
+leg-only experiment. CSV output records measured positions, velocities, efforts,
+and requested references in joint-name order.
+
+Normal completion and Ctrl+C request a position hold with zero velocity,
+acceleration, and feedforward effort. The controller-only launch also enables
+`command_timeout:=0.5`: after half a wall second without a trajectory message,
+the controller holds its last position with zero velocity and feedforward.
+Standalone replay refuses a controller without a positive timeout. Other
+controller launches retain their existing behavior unless they enable this
+parameter.
+
+A position hold is not balance recovery or an emergency stop. Use the robot
+team's established support and stop procedure for physical validation. Homing,
+full MAT replay, and command expiry were checked with the live ROS 2 interfaces
+against MuJoCo; the physical robot has not been commanded.
 
 ## 7. Validate unloaded before the 30 kg experiment
 
@@ -130,6 +155,6 @@ disabled; it has not been reoptimized for the loaded leg-only robot. Across runs
 tracking error reached 18.3 degrees and joint torque reached the model's 185 Nm
 limit. Simulation completion alone does not establish hardware readiness.
 
-To finish the executable hardware instructions, the next required information is
-the robot's normal startup command and XBot hardware YAML path, including the
-joint modes and gains it uses.
+The robot-specific inputs are its normal XBot startup command and calibrated
+controller YAML. They remain supplied by the robot setup; the package does not
+guess hardware gains or start a hardware driver.
