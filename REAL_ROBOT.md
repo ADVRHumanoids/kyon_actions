@@ -1,8 +1,8 @@
 # Real robot: ROS 2 step-up workflow
 
-**Status: inspection and recording commands are available. Hardware homing and
-trajectory replay are not implemented on this branch yet.** The simulation
-launcher cannot be used to command the physical robot.
+**Status: the ROS 2 controller exists and the MAT publisher works in simulation.
+The standalone hardware homing/replay command still needs porting.** The simulation
+launcher starts MuJoCo and cannot be used as the hardware entry point.
 
 ## 1. Open the robot's normal ROS 2 terminal
 
@@ -74,10 +74,12 @@ Ctrl+C in this terminal stops the recording. It does not stop the robot.
 The automatic PDF currently consumes simulation `telemetry.npz`; conversion of
 hardware recordings into that report is not implemented yet.
 
-## 5. Home to the trajectory's initial posture — implementation pending
+## 5. Home the 12 leg joints to the trajectory's initial posture
 
-A hardware homing command must interpolate from measured joint positions to the
-MAT file's first joint posture, using the robot's calibrated modes and gains.
+A hardware homing command must interpolate the 12 measured leg joint positions
+to `q[7:, 0]` from the MAT file, using the robot's calibrated modes and gains.
+There are no arm/gripper targets. The first seven entries describe the floating
+base and are not joint homing targets.
 It must verify measured convergence before replay starts. The simulation's
 initial keyframe places the robot directly into its start state and is not a
 hardware homing procedure.
@@ -85,17 +87,37 @@ hardware homing procedure.
 There is no ROS 2 hardware homing command in this package yet. The ROS 1
 implementation on `master` assumes arm/gripper joints and a different interface.
 
-## 6. Start the replay controller and replay — implementation pending
+## 6. Start the existing ROS 2 controller, then publish the MAT trajectory
 
-The remaining implementation needs:
+The controller is already implemented in `kyon_controller` and is the same one
+used by the simulation pipeline. The old ROS 1 `controller_step_up.launch` only
+started that controller; the ROS 1 `replayer.py` provided the separate `homing`
+and `replay` modes.
 
-- A controller-only launch using the live robot descriptions and hardware gains.
-- A hardware replayer with measured-state homing, wall-time pacing, initial-pose
-  checks, and recording of the actual joint feedback.
-- A controlled stop for completion, interruption, invalid input, and lost or
-  stale trajectory messages.
+The equivalent ROS 2 controller-only launch is now available:
 
-The current controller continues sending the last position, velocity, and torque
+```bash
+ros2 launch kyon_actions controller_step_up.launch.py \
+  config:=/absolute/path/to/robot_controller.yaml \
+  mpc_config:=/absolute/path/to/replay_model.yaml
+```
+
+Replace the paths with the verified hardware controller configuration and replay
+model configuration. `config` supplies joint gains/modes; `mpc_config` supplies
+`n_nodes`, `dt`, and `model.fixed_joint_map`. Both files are required. The launch
+uses the live XBot robot descriptions and wall time, and starts no MPC publisher.
+Launch it after homing with the correct hardware configuration: controller
+initialization changes joint control modes.
+
+The remaining port is the standalone ROS 2 equivalent of the old replayer's two
+modes: measured-state homing, followed by wall-time publishing of the saved
+`WBTrajectory` samples on `/mpc_solution`. The simulation replayer already
+publishes that ROS 2 message; its simulator startup, initial keyframe, `/clock`,
+and simulator-only feedback dependencies must be separated from the hardware
+entry point. No new tracking controller is needed.
+
+Completion/interruption handling also needs attention: the current controller
+continues sending the last position, velocity, and torque
 references after its publisher disappears. Stopping the publisher with Ctrl+C
 does not provide a controlled robot stop. Validate the stop behavior using the
 robot team's established support and stop procedure before a motion trial.

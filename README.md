@@ -93,5 +93,6 @@ python3 -m unittest test_replay_sim_ros2 -v
 Follow [REAL_ROBOT.md](REAL_ROBOT.md) for the numbered hardware workflow,
 inspection commands, and feedback recording commands.
 
-Hardware homing and replay are not implemented yet. The guide marks those steps
-explicitly and explains which robot configuration is needed to complete them.
+The existing controller is exposed through `controller_step_up.launch.py`, with
+required controller/model YAML paths. The standalone ROS 2 homing and MAT replay
+command still needs porting; the tracking controller itself is already available.
