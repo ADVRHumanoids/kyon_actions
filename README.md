@@ -1,116 +1,29 @@
-# Kyon Actions — ROS 2
+# Kyon motion replay — ROS 2
 
-The `ros2` branch contains the ROS 2 replay pipeline. The original ROS 1 implementation remains on `master`.
+Run homing and saved MAT motions through an already running ROS 2 XBotCore.
+Use the [Docker instructions](docker/README.md) for building, transferring and
+running the replay container, and [REAL_ROBOT.md](REAL_ROBOT.md) for hardware
+setup and feedback checks. The controller and replayer use XBotCore's live
+URDF/SRDF; the container starts no hardware drivers or motion automatically.
 
-## ROS 2 simulation without arms
+## Selected motion
 
-`replay_sim_ros2.py` runs `step_up_clearance.mat` through the current
-`kyon_controller` in MuJoCo, using a robot without arms and a 30 cm obstacle.
-The saved file was optimized for the full robot. This replay uses its joint
-positions and velocities with **feedforward torques disabled**; regenerate the
-optimization for the leg-only model before treating this as a dynamics experiment.
+[step_up_30kg_optimized_v2.mat](mat_files/step_up_30kg_optimized_v2.mat):
+12 leg joints, no arms, 30 kg at the existing payload mount, 30 cm step,
+20.28 s duration. Total modeled mass is 98.654 kg. Replay with
+`--feedforward --rate 500`; the live model must match the MAT's URDF signature.
 
-Run the complete pipeline from the host workspace:
+The optimization minimizes peak torque. Its selected feasible checkpoint has
+89.4 Nm predicted peak and passed dynamics and sampled mesh checks; the solver
+reached its iteration limit without proving optimality. MuJoCo replays completed
+once at a 115 Nm applied cap and once at 100 Nm. The 100 Nm replay had 7.0° peak
+joint error and 13.75 cm final body-position error. These are individual
+simulation runs, not hardware validation or a repeatability claim.
 
-```bash
-# Unloaded baseline
-./src/kyon_actions/run_step_up_sim.sh
+[step_up_30kg_optimized_v2.yaml](config/step_up_30kg_optimized_v2.yaml) records
+the tested K=2000/D=120 simulation gains. The controller applies its selected
+YAML gains on the first trajectory message; use calibrated hardware settings.
+No experimental 100 Nm cap is applied by the robot replay commands.
 
-# Same motion with 30 kg on the existing pelvis payload mount
-./src/kyon_actions/run_step_up_sim.sh --payload-kg 30
-```
-
-The launcher creates or starts `kyon-step-up-sim` from the local `hhcm-dev:noble`
-image, installs missing GLFW development headers, installs the robot description,
-builds the simulator and the `ament_cmake` actions package, and runs the replay on ROS domain 77 with CPU rendering.
-Creating the container requires `DISPLAY` and `XAUTHORITY` for the viewer.
-The workspace must already contain its built ROS 2/XBot dependencies. The simulator
-changes are on `xbot2_mujoco` branch `ros2`; the payload mount fix is on
-`iit-kyon-ros-pkg` branch `ros2`. `kyon_codesign` remains a separate, pending ROS 2 migration.
-
-The replay starts the simulator, XBot in `mj` mode, and the controller; it stops
-them after replay or a detected fall. `result.json` and `tracking.csv` record
-the outcome; each process has a separate log. Results go to
-`artifacts/step_up_clearance_legs_only` or
-`artifacts/step_up_clearance_legs_only_payload_30kg`; `--output` overrides that path
-inside the container. Reusing an output path replaces its previous results.
-A fall returns exit code 2.
-`--prepare-only` generates the model and configuration without starting simulation.
-The MAT file's duration is computed from its 507 intervals at 0.04 s: 20.28 s.
-
-After each completed replay or detected fall, the pipeline automatically writes
-`plots/report.pdf` and six PNG graphs in the experiment directory:
-
-- `torques.png`: applied torque for all 12 joints, with URDF torque limits.
-- `velocities.png`: measured and requested joint velocities, with velocity limits.
-- `positions.png` and `tracking_errors.png`: measured and requested positions and their errors.
-- `base_motion.png`: base position, roll, pitch, and yaw against the replay reference.
-- `mechanical_power.png`: joint mechanical power, calculated as applied torque times measured velocity.
-
-Each row of the joint plots corresponds to one leg. Time zero is the start of
-the motion; the initial and final posture holds are shaded. Torque and velocity
-come from simulation feedback. Mechanical power excludes electrical losses.
-The underlying per-joint measurements and replay references are stored in
-`telemetry.npz`, sampled once per new joint-state message.
-
-To regenerate graphs from a recorded run without repeating the simulation,
-run this inside the container (no ROS environment is needed):
-
-```bash
-python3 /hhcm_ws/install/lib/kyon_actions/plot_experiment.py \
-  /hhcm_ws/artifacts/step_up_clearance_legs_only_payload_30kg
-```
-
-The payload is a rigid 20 cm cube at the existing `pelvis_to_payload` mount:
-`[-0.2, 0, 0.2]` meters in the pelvis frame. Its mass, box inertia, and collision
-geometry are included in both controller and simulation models. Use
-`--payload-position X Y Z` only to model a different mounting position.
-The original mount height parameter (`pelvis_height=0.20`) was restored from the
-robot-description history. No arms are present.
-
-The 30 kg runs completed the 30 cm climb in simulation with total mass 98.654 kg.
-Peak joint tracking error varied between 0.130 and 0.319 rad (7.5 to 18.3 degrees),
-and reported joint effort reached the model's 185 Nm limit. This is a saved-motion
-replay with feedforward disabled; the trajectory has not been optimized for the
-loaded robot.
-
-This requires the workspace's updated MuJoCo simulator, including initial `home`
-keyframe support, simulated-clock transport, and bounded forces applied directly
-to the joints of a URDF model without actuators. To run checks in the container:
-
-```bash
-source /opt/ros/jazzy/setup.bash
-source /opt/xbot/setup.sh
-source /hhcm_ws/setup.bash
-cmake --build /hhcm_ws/build/xbot2_mujoco --target test_joint_forces -j4
-ctest --test-dir /hhcm_ws/build/xbot2_mujoco --output-on-failure
-cd /hhcm_ws/src/kyon_actions
-python3 -m unittest test_replay_sim_ros2 -v
-```
-
-## Real robot with ROS 2
-
-Follow [REAL_ROBOT.md](REAL_ROBOT.md) for the numbered hardware workflow,
-inspection commands, and feedback recording commands.
-
-After starting the robot's normal XBot stack, the ROS 2 equivalent of the old
-homing → controller → replay sequence is:
-
-```bash
-ros2 run kyon_actions replayer_ros2.py homing
-# Separate terminal; substitute the robot's calibrated controller YAML:
-ros2 launch kyon_actions controller_step_up.launch.py config:=/path/to/robot_controller.yaml
-# After the controller starts:
-ros2 run kyon_actions replayer_ros2.py replay
-```
-
-The default file is `step_up_clearance.mat`; use `-f /path/to/file.mat` for another
-trajectory. `info` prints the initial joint posture without connecting to XBot.
-Both homing and replay save measured positions, velocities, applied efforts,
-and references to CSV. Homing preserves the existing gains. Replay uses zero
-feedforward torque, as in the tested leg-only simulation.
-
-The controller-only launch enables a 0.5 s wall-time command timeout. The latest
-`kyon_controller` build is required; the replayer checks for this timeout before
-publishing. These commands and publisher-loss handling were exercised against
-MuJoCo. Physical robot validation remains outstanding; see the hardware guide.
+The original MAT files are preserved. Experiments and generated results stay
+local; they are not required on the robot.

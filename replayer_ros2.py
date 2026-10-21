@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Home the 12 leg joints or replay a MAT trajectory through the live ROS 2 stack."""
 import argparse
+import hashlib
 from pathlib import Path
 import time
 import xml.etree.ElementTree as ET
@@ -10,7 +11,7 @@ import numpy as np
 from replay_sim_ros2 import JOINTS, joint_feedback, load_trajectory, package_directory
 
 
-def reference_at(data, dt, elapsed):
+def reference_at(data, dt, elapsed, hermite=False):
     n = data['a'].shape[1]
     coordinate = np.clip(elapsed / dt, 0, n)
     i = min(int(coordinate), n - 1)
@@ -18,11 +19,42 @@ def reference_at(data, dt, elapsed):
     q = (1 - alpha) * data['q'][:, i] + alpha * data['q'][:, i + 1]
     q[3:7] /= np.linalg.norm(q[3:7])
     v = (1 - alpha) * data['v'][:, i] + alpha * data['v'][:, i + 1]
+    if hermite:
+        q0, q1 = data['q'][7:, i], data['q'][7:, i+1]
+        v0, v1 = data['v'][6:, i], data['v'][6:, i+1]
+        q[7:] = ((2*alpha**3-3*alpha**2+1)*q0+(alpha**3-2*alpha**2+alpha)*dt*v0
+                 +(-2*alpha**3+3*alpha**2)*q1+(alpha**3-alpha**2)*dt*v1)
+        v[6:] = ((6*alpha**2-6*alpha)/dt*q0+(3*alpha**2-4*alpha+1)*v0
+                 +(-6*alpha**2+6*alpha)/dt*q1+(3*alpha**2-2*alpha)*v1)
     a = data['a'][:, i].copy()
     if elapsed >= n * dt:
         v[:] = 0
         a[:] = 0
     return q, v, a
+
+
+def feedforward_at(data, dt, elapsed):
+    n = data['tau'].shape[1]
+    coordinate = np.clip(elapsed/dt, 0, n)
+    i = min(int(coordinate), n-1)
+    alpha = coordinate-i
+    return (1-alpha)*data['tau'][:, i]+alpha*data['tau'][:, min(i+1, n-1)]
+
+
+def validate_feedforward(urdf, data, live_mass):
+    signature = np.asarray(data.get('urdf_sha256', ''))
+    if signature.size != 1 or str(signature.item()) != hashlib.sha256(urdf.encode()).hexdigest():
+        raise ValueError('Feedforward requires the exact optimizer URDF signature; regenerate the plan for the live model')
+    mass = float(np.asarray(data['robot_mass']).item())
+    if not np.isfinite(mass) or abs(mass-live_mass) > 1e-6:
+        raise ValueError('Feedforward trajectory mass differs from the live model')
+    if np.max(np.abs(data['tau'][:6])) > 1.:
+        raise ValueError('Feedforward trajectory has an unbalanced floating-base wrench')
+    tree = ET.fromstring(urdf)
+    for i, name in enumerate(JOINTS):
+        limit = float(tree.find(f"joint[@name='{name}']/limit").get('effort'))
+        if np.max(np.abs(data['tau'][i+6])) > limit+1e-6:
+            raise ValueError(f'Feedforward exceeds the live effort limit for {name}')
 
 
 def homing_position(start, target, elapsed, duration):
@@ -102,7 +134,7 @@ def run(args, data, dt, n):
             raise ValueError('Joint feedback contains non-finite values')
         return values
 
-    def publish(q, v, a):
+    def publish(q, v, a, feedforward=None):
         nonlocal sent, last_q
         if args.mode == 'homing':
             msg = JointCommand()
@@ -116,7 +148,7 @@ def run(args, data, dt, n):
             msg.header.frame_id = 'world'
             msg.joint_names = JOINTS
             msg.q, msg.v, msg.a = q.tolist(), v.tolist(), a.tolist()
-            msg.tau = [0.] * 18  # Saved full-body torques do not match the leg-only model.
+            msg.tau = [0.] * 18 if feedforward is None else feedforward.astype(float).tolist()
         msg.header.stamp = node.get_clock().now().to_msg()
         publisher.publish(msg)
         last_q, sent = q.copy(), True
@@ -124,6 +156,8 @@ def run(args, data, dt, n):
     try:
         wait_for(lambda: state['urdf'] is not None and state['joints'] is not None)
         kd = validate_model(state['urdf'], data)
+        if args.feedforward:
+            validate_feedforward(state['urdf'], data, float(kd.mass()))
         q_measured, v_measured, _ = measured()
         if set(state['joints'].name) != set(JOINTS):
             raise ValueError('Joint feedback must contain exactly the 12 leg joints')
@@ -164,11 +198,12 @@ def run(args, data, dt, n):
             if node.count_publishers(topic) != 1 or publisher.get_subscription_count() == 0:
                 raise RuntimeError('Command connection changed during motion')
             elapsed = now - beginning
-            q, v, a = reference_at(data, dt, elapsed if args.mode == 'replay' else 0.)
+            q, v, a = reference_at(data, dt, elapsed if args.mode == 'replay' else 0., hermite=args.feedforward)
+            feedforward = feedforward_at(data, dt, elapsed) if args.feedforward else None
             if args.mode == 'homing':
                 q[7:] = homing_position(start_q, data['q'][7:, 0], elapsed, duration)
                 v[:], a[:] = 0., 0.
-            publish(q, v, a)
+            publish(q, v, a, feedforward)
             records.append([elapsed, *q_measured, *v_measured, *torque, *q[7:], *v[6:]])
             if elapsed >= duration + 1.:
                 if args.mode == 'homing' and np.max(np.abs(q_measured - data['q'][7:, 0])) > args.position_tolerance:
@@ -204,7 +239,11 @@ def main():
     parser.add_argument('--position-tolerance', type=float, default=.05, help='Radians')
     parser.add_argument('--feedback-timeout', type=float, default=.5, help='Wall seconds')
     parser.add_argument('--output', type=Path)
+    parser.add_argument('--feedforward', action='store_true',
+                        help='Replay model-matched optimized torques and Hermite joint references; requires the exact live URDF')
     args = parser.parse_args()
+    if args.feedforward and args.mode != 'replay':
+        parser.error('--feedforward is only supported in replay mode')
     if any(not np.isfinite(value) or value <= 0 for value in
            (args.duration, args.rate, args.position_tolerance, args.feedback_timeout)):
         parser.error('Duration, rate, position tolerance, and feedback timeout must be finite and positive')

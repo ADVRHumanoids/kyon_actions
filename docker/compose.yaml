@@ -1,0 +1,21 @@
+name: kyon-replay
+
+services:
+  replay:
+    image: kyon-replay:ros2
+    build:
+      context: ../../..
+      dockerfile: src/kyon_actions/docker/Dockerfile
+      args:
+        CONTROLLER_IMAGE: ${CONTROLLER_IMAGE:-kyon-controller:latest}
+    network_mode: host
+    ipc: host
+    environment:
+      ROS_DOMAIN_ID: ${ROS_DOMAIN_ID:?Set the ROS domain used by the robot XBot stack}
+    volumes:
+      - ${ROBOT_CONFIG_DIR:?Set an absolute directory containing the calibrated hardware controller YAML}:/robot-config:ro
+      - ${REPLAY_DATA_DIR:-../../../artifacts/robot_replay}:/data
+    command: ["sleep", "infinity"]
+    restart: "no"
+    stdin_open: true
+    tty: true
