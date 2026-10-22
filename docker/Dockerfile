@@ -23,19 +23,29 @@ RUN source /opt/ros/jazzy/setup.bash && \
     cmake -S /tmp/kyon_actions -B /tmp/kyon-actions-build \
       -DCMAKE_INSTALL_PREFIX=/opt/kyon-replay -DINSTALL_SIMULATION_TOOLS=OFF && \
     cmake --build /tmp/kyon-actions-build --parallel 4 && \
-    cmake --install /tmp/kyon-actions-build
+    cmake --install /tmp/kyon-actions-build && \
+    ln -sf /workspace/kyon_actions/replayer_ros2.py \
+      /workspace/kyon_actions/trajectory_io.py /opt/kyon-replay/lib/kyon_actions/ && \
+    rm -rf /opt/kyon-replay/share/kyon_actions/config \
+      /opt/kyon-replay/share/kyon_actions/mat_files && \
+    ln -s /workspace/kyon_actions/config /workspace/kyon_actions/mat_files \
+      /opt/kyon-replay/share/kyon_actions/
 
 FROM ros:jazzy-ros-base
 SHELL ["/bin/bash", "-c"]
+ARG REPLAY_UID=1000
+ARG REPLAY_GID=1000
 RUN apt-get update && apt-get install -y --no-install-recommends \
       python3-numpy python3-scipy python3-yaml && \
     rm -rf /var/lib/apt/lists/* && \
-    useradd --create-home --uid 1000 --non-unique replay && \
+    groupadd --gid "${REPLAY_GID}" --non-unique replay && \
+    useradd --create-home --uid "${REPLAY_UID}" --gid replay --non-unique replay && \
     mkdir -p /data && chown replay:replay /data
 COPY --from=build /opt/kyon-replay /opt/kyon-replay
+COPY --chown=replay:replay . /workspace/kyon_actions
 COPY --chmod=755 docker/entrypoint.sh /usr/local/bin/kyon-replay-entrypoint
 ENV PYTHONDONTWRITEBYTECODE=1
 USER replay
-WORKDIR /data
+WORKDIR /workspace/kyon_actions
 ENTRYPOINT ["/usr/local/bin/kyon-replay-entrypoint"]
 CMD ["bash"]

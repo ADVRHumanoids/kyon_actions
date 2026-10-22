@@ -8,7 +8,8 @@ no `kyon_controller`, Horizon, horizon_rti or phase_manager.
 From the `kyon_actions` repository:
 
 ```bash
-docker build -f docker/Dockerfile -t kyon-replay:ros2 .
+docker build -f docker/Dockerfile -t kyon-replay:ros2 \
+  --build-arg REPLAY_UID="$(id -u)" --build-arg REPLAY_GID="$(id -g)" .
 ```
 
 ## 2. Open the container
@@ -22,6 +23,10 @@ docker compose -f docker/compose.yaml up -d --no-build
 docker compose -f docker/compose.yaml exec replay kyon-replay-entrypoint bash
 ```
 
+The shell opens in `/workspace/kyon_actions`, your writable host checkout.
+Edit the Python files, `config/` or `mat_files/` there; changes persist on the
+host and the next `ros2 run` uses them. No root access or rebuild is needed.
+
 ## 3. Home and replay — same terminal
 
 The default file is `step_up_30kg_optimized_v2.mat`:
@@ -30,7 +35,7 @@ The default file is `step_up_30kg_optimized_v2.mat`:
 ros2 run kyon_actions replayer_ros2.py homing --output /data/homing_feedback.csv
 
 ros2 run kyon_actions replayer_ros2.py replay --feedforward \
-  --config "$(ros2 pkg prefix --share kyon_actions)/config/step_up_30kg_optimized_v2.yaml" \
+  --config config/step_up_30kg_optimized_v2.yaml \
   --output /data/replay_feedback.csv
 ```
 

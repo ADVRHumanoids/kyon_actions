@@ -8,6 +8,8 @@ in the replay image.
 Follow [docker/README.md](docker/README.md) to build and run it. The publisher
 uses XBotCore's live URDF; it starts no hardware driver or motion automatically.
 [REAL_ROBOT.md](REAL_ROBOT.md) describes model, feedback and stop checks.
+The container mounts this checkout at `/workspace/kyon_actions`; Python, MAT
+and gain-file edits take effect on the next run without rebuilding.
 
 ## Selected motion
 
