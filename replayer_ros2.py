@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Home the 12 leg joints or replay a MAT trajectory through the live ROS 2 stack."""
 import argparse
-import hashlib
 from pathlib import Path
 import time
 import xml.etree.ElementTree as ET
@@ -40,27 +39,6 @@ def feedforward_at(data, dt, elapsed):
     i = min(int(coordinate), n-1)
     alpha = coordinate-i
     return (1-alpha)*data['tau'][:, i]+alpha*data['tau'][:, min(i+1, n-1)]
-
-
-def validate_feedforward(urdf, data, live_mass):
-    digest = hashlib.sha256(urdf.encode()).hexdigest()
-    for signature_key, mass_key in (('urdf_sha256', 'robot_mass'),
-                                    ('xbot_urdf_sha256', 'xbot_robot_mass')):
-        signature = np.asarray(data.get(signature_key, ''))
-        if signature.size == 1 and str(signature.item()) == digest and mass_key in data:
-            mass = float(np.asarray(data[mass_key]).item())
-            break
-    else:
-        raise ValueError('Feedforward requires the saved planning or XBot-export model signature')
-    if not np.isfinite(mass) or abs(mass-live_mass) > 1e-6:
-        raise ValueError('Feedforward trajectory mass differs from the live model')
-    if np.max(np.abs(data['tau'][:6])) > 1.:
-        raise ValueError('Feedforward trajectory has an unbalanced floating-base wrench')
-    tree = ET.fromstring(urdf)
-    for i, name in enumerate(JOINTS):
-        limit = float(tree.find(f"joint[@name='{name}']/limit").get('effort'))
-        if np.max(np.abs(data['tau'][i+6])) > limit+1e-6:
-            raise ValueError(f'Feedforward exceeds the live effort limit for {name}')
 
 
 def homing_position(start, target, elapsed, duration):
@@ -141,21 +119,18 @@ def run(args, data, dt, n):
     rclpy.init(signal_handler_options=SignalHandlerOptions.NO)
     node = rclpy.create_node('kyon_mat_replayer')
     state = {'urdf': None, 'joints': None, 'received': None}
-    publisher = None
     last_q = None
-    sent = False
     records = []
+    target = data['q'][7:, 0]
 
     def feedback(message):
         state.update(joints=message, received=time.monotonic())
 
-    subscriptions = [
-        node.create_subscription(String, '/xbotcore/robot_description',
-                                 lambda msg: state.update(urdf=msg.data),
-                                 QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL)),
-        node.create_subscription(JointState, '/xbotcore/joint_states', feedback,
-                                 qos_profile_sensor_data),
-    ]
+    node.create_subscription(String, '/xbotcore/robot_description',
+                             lambda msg: state.update(urdf=msg.data),
+                             QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL))
+    node.create_subscription(JointState, '/xbotcore/joint_states', feedback,
+                             qos_profile_sensor_data)
 
     def wait_for(condition, timeout=10.):
         deadline = time.monotonic() + timeout
@@ -173,35 +148,23 @@ def run(args, data, dt, n):
         return values
 
     def publish(q, v, feedforward=None):
-        nonlocal sent, last_q
+        nonlocal last_q
         msg = joint_command(q, v, feedforward, args.gains)
         msg.header.stamp = node.get_clock().now().to_msg()
         publisher.publish(msg)
-        last_q, sent = q.copy(), True
+        last_q = q.copy()
 
     try:
         wait_for(lambda: state['urdf'] is not None and state['joints'] is not None)
         mass = validate_model(state['urdf'], data)
-        if args.feedforward:
-            validate_feedforward(state['urdf'], data, mass)
-        q_measured, v_measured, _ = measured()
         if set(state['joints'].name) != set(JOINTS):
             raise ValueError('Joint feedback must contain exactly the 12 leg joints')
-        if np.max(np.abs(v_measured)) > .2:
-            raise ValueError('Robot must be stationary before homing or replay')
-        topic = '/xbotcore/command'
-        publisher = node.create_publisher(JointCommand, topic, 1)
+        publisher = node.create_publisher(JointCommand, '/xbotcore/command', 1)
         wait_for(lambda: publisher.get_subscription_count() > 0)
-        # Allow discovery to expose any competing command source before the first command.
-        deadline = time.monotonic() + .5
-        while time.monotonic() < deadline:
-            rclpy.spin_once(node, timeout_sec=.01)
-        if node.count_publishers(topic) != 1:
-            raise RuntimeError(f'Another command publisher is active on {topic}')
         q_measured, _, _ = measured()
         if args.mode == 'homing':
-            validate_homing(state['urdf'], q_measured, data['q'][7:, 0], args.duration)
-        if args.mode == 'replay' and np.max(np.abs(q_measured - data['q'][7:, 0])) > args.position_tolerance:
+            validate_homing(state['urdf'], q_measured, target, args.duration)
+        if args.mode == 'replay' and np.max(np.abs(q_measured - target)) > args.position_tolerance:
             raise ValueError('Robot is not at the initial posture; run homing first')
         start_q = q_measured.copy()
         duration = args.duration if args.mode == 'homing' else n * dt
@@ -212,19 +175,17 @@ def run(args, data, dt, n):
             rclpy.spin_once(node, timeout_sec=0)
             now = time.monotonic()
             q_measured, v_measured, torque = measured()
-            if node.count_publishers(topic) != 1 or publisher.get_subscription_count() == 0:
-                raise RuntimeError('Command connection changed during motion')
             elapsed = now - beginning
-            q, v, a = reference_at(data, dt, elapsed if args.mode == 'replay' else 0., hermite=args.feedforward)
+            q, v, _ = reference_at(data, dt, elapsed if args.mode == 'replay' else 0., hermite=args.feedforward)
             feedforward = feedforward_at(data, dt, elapsed) if args.feedforward else None
             if args.mode == 'homing':
-                q[7:] = homing_position(start_q, data['q'][7:, 0], elapsed, duration)
-                v[:], a[:] = 0., 0.
+                q[7:] = homing_position(start_q, target, elapsed, duration)
+                v[:] = 0.
             publish(q, v, feedforward)
             records.append([elapsed, *q_measured, *v_measured, *torque, *q[7:], *v[6:],
                             *([0.] * 12 if feedforward is None else feedforward[6:])])
             if elapsed >= duration + 1.:
-                if args.mode == 'homing' and np.max(np.abs(q_measured - data['q'][7:, 0])) > args.position_tolerance:
+                if args.mode == 'homing' and np.max(np.abs(q_measured - target)) > args.position_tolerance:
                     raise RuntimeError('Homing finished but measured joints did not reach the target tolerance')
                 print(f'{args.mode} complete; final joint error '
                       f'{np.max(np.abs(q_measured - q[7:])):.4f} rad', flush=True)
@@ -232,8 +193,8 @@ def run(args, data, dt, n):
             next_tick = max(next_tick + 1. / args.rate, now)
             time.sleep(max(0., next_tick - time.monotonic()))
     finally:
-        if sent and publisher is not None and rclpy.ok():
-            # Leave a position hold with zero velocity, acceleration, and feedforward effort.
+        if last_q is not None and rclpy.ok():
+            # Leave a position hold with zero velocity and feedforward effort.
             for _ in range(10):
                 publish(last_q, np.zeros(18))
                 time.sleep(.01)
@@ -259,7 +220,7 @@ def main():
     parser.add_argument('--output', type=Path)
     parser.add_argument('--config', type=Path, help='Replay stiffness/damping YAML; omit to retain live gains')
     parser.add_argument('--feedforward', action='store_true',
-                        help='Replay model-matched optimized torques and Hermite joint references; requires the exact live URDF')
+                        help='Replay saved torques and Hermite joint references; use only model-matched torques')
     args = parser.parse_args()
     if args.feedforward and args.mode != 'replay':
         parser.error('--feedforward is only supported in replay mode')

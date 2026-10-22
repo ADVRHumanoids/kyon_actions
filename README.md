@@ -16,10 +16,8 @@ uses XBotCore's live URDF; it starts no hardware driver or motion automatically.
 20.28 s duration. Total modeled mass is 98.654 kg. It is the default file.
 Use `--feedforward` for the optimized torques; other files can be selected with `-f`.
 
-The MAT includes exact signatures for the planning URDF and XBot's serialized
-export, with their corresponding masses. These allow validation of XBotCore's
-published model without a dynamics library. Motion arrays and planned torques
-are unchanged by this metadata addition. Unexpected models are rejected.
+The publisher checks the trajectory against the live joint limits. Feedforward
+requires a matching robot and payload; saved model signatures are not checked.
 
 [step_up_30kg_optimized_v2.yaml](config/step_up_30kg_optimized_v2.yaml) contains
 the K=2000/D=120 simulation profile. Pass it with `replay --config ...` to apply

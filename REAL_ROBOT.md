@@ -8,12 +8,11 @@ command publisher alongside this replayer.
 
 - Match `ROS_DOMAIN_ID` to XBotCore; 77 was only the isolated simulation domain.
 - Use the 12 leg joints, no arms and the 30 kg payload setup matching the MAT.
-  Feedforward requires an exact saved planning or XBot-export URDF signature
-  and the corresponding mass. Model mismatches are rejected.
+  Use feedforward only for a matching robot and payload; model signatures and
+  payload mass are not checked. Live joint limits are checked.
 - Homing preserves the live stiffness/damping and moves to the MAT's initial
-  posture over five seconds. Replay requires a stationary robot and initial
-  joint error below 0.05 rad. The publisher rejects stale feedback or another
-  publisher on `/xbotcore/command`.
+  posture over five seconds. Replay requires initial joint error below 0.05 rad.
+  The publisher rejects stale feedback; it does not detect competing publishers.
 - `replay --config ...` sets the provided stiffness/damping. Omitting it retains
   the current gains. The included K=2000/D=120 profile was tested in simulation.
 - Hardware control modes, motor limits and the stop procedure remain in your

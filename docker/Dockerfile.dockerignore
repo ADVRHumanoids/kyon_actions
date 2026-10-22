@@ -4,8 +4,11 @@
 !replayer_ros2.py
 !trajectory_io.py
 !config/
+config/**
 !config/step_up_30kg_optimized_v2.yaml
 !mat_files/
+mat_files/**
 !mat_files/step_up_30kg_optimized_v2.mat
 !docker/
+docker/**
 !docker/entrypoint.sh
