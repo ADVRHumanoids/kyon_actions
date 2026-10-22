@@ -12,9 +12,10 @@ and replayer; start your normal hardware XBotCore separately.
   robot description and regenerate the trajectory for it; do not bypass the check.
 - Match the container's `ROS_DOMAIN_ID` to XBotCore. Simulation used 77;
   the robot's domain may differ. The Compose file uses host networking.
-- Select the robot's calibrated controller YAML. The packaged K=2000/D=120
-  profile was tested in simulation. The controller sets these gains when the
-  first trajectory message arrives; editing the YAML does not reload it live.
+- The Docker guide selects the included `step_up_30kg_optimized_v2.yaml`,
+  with K=2000/D=120. The controller applies these gains on the first trajectory
+  message. These settings were tested in simulation; editing the YAML does not
+  reload it live.
 - Verify the robot's existing control modes, total-effort limiting, support
   and stop procedure. The 100/115 Nm caps were simulation experiments only.
   The source leg URDF retains 185 Nm; the publisher sets no hardware torque cap.

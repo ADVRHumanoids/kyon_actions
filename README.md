@@ -1,7 +1,7 @@
 # Kyon motion replay — ROS 2
 
 Run homing and saved MAT motions through an already running ROS 2 XBotCore.
-Use the [Docker instructions](docker/README.md) for building, transferring and
+Use the [Docker instructions](docker/README.md) for building and
 running the replay container, and [REAL_ROBOT.md](REAL_ROBOT.md) for hardware
 setup and feedback checks. The controller and replayer use XBotCore's live
 URDF/SRDF; the container starts no hardware drivers or motion automatically.
@@ -22,7 +22,7 @@ simulation runs, not hardware validation or a repeatability claim.
 
 [step_up_30kg_optimized_v2.yaml](config/step_up_30kg_optimized_v2.yaml) records
 the tested K=2000/D=120 simulation gains. The controller applies its selected
-YAML gains on the first trajectory message; use calibrated hardware settings.
+YAML gains on the first trajectory message.
 No experimental 100 Nm cap is applied by the robot replay commands.
 
 The original MAT files are preserved. Experiments and generated results stay
