@@ -1,65 +1,50 @@
-# Real robot: ROS 2 replay
+# Real robot: direct ROS 2 replay
 
-Follow [docker/README.md](docker/README.md) for the command sequence:
-**home → start controller → replay**. The container runs only the controller
-and replayer; start your normal hardware XBotCore separately.
+Use [docker/README.md](docker/README.md): **home → replay**, in one terminal.
+XBotCore must already be running. Do not launch `kyon_controller` or another
+command publisher alongside this replayer.
 
-## Before motion
+## Setup
 
-- Use the actual arm-free, 12-joint robot model and the 30 kg payload setup
-  matching `step_up_30kg_optimized_v2.mat`. The feedforward command requires
-  its exact live URDF signature and mass. If it rejects the model, check the
-  robot description and regenerate the trajectory for it; do not bypass the check.
-- Match the container's `ROS_DOMAIN_ID` to XBotCore. Simulation used 77;
-  the robot's domain may differ. The Compose file uses host networking.
-- The Docker guide selects the included `step_up_30kg_optimized_v2.yaml`,
-  with K=2000/D=120. The controller applies these gains on the first trajectory
-  message. These settings were tested in simulation; editing the YAML does not
-  reload it live.
-- Verify the robot's existing control modes, total-effort limiting, support
-  and stop procedure. The 100/115 Nm caps were simulation experiments only.
-  The source leg URDF retains 185 Nm; the publisher sets no hardware torque cap.
-- Use a single command source. Do not start the general controller launch
-  alongside replay: it also starts an MPC publisher.
+- Match `ROS_DOMAIN_ID` to XBotCore; 77 was only the isolated simulation domain.
+- Use the 12 leg joints, no arms and the 30 kg payload setup matching the MAT.
+  Feedforward requires an exact saved planning or XBot-export URDF signature
+  and the corresponding mass. Model mismatches are rejected.
+- Homing preserves the live stiffness/damping and moves to the MAT's initial
+  posture over five seconds. Replay requires a stationary robot and initial
+  joint error below 0.05 rad. The publisher rejects stale feedback or another
+  publisher on `/xbotcore/command`.
+- `replay --config ...` sets the provided stiffness/damping. Omitting it retains
+  the current gains. The included K=2000/D=120 profile was tested in simulation.
+- Hardware control modes, motor limits and the stop procedure remain in your
+  existing XBotCore setup. The replay image does not change the URDF or install
+  a 100 Nm effort ceiling.
 
-## Check the live connection
+## Inspect and record
 
-Inside the replay container, these commands only inspect state:
+Inside the container, inspect current joint positions, velocities, efforts and gains:
 
 ```bash
-echo "${ROS_DOMAIN_ID:-0}"
-ros2 node list
-ros2 topic info /xbotcore/robot_description
-ros2 topic info /xbotcore/robot_description_semantic
 ros2 topic echo /xbotcore/joint_states --once
 ```
 
-Inspect joint names, measured positions/velocities, efforts, stiffness and
-damping. Before homing the robot must be stationary. Homing moves only the
-12 leg joints to the MAT's initial posture over five seconds, preserving the
-current gains. Replay requires an initial posture error below 0.05 rad.
-
-## Record feedback
-
-In another container shell, choose a fresh recording name:
+For a complete recording, in another container shell:
 
 ```bash
 ros2 bag record -o /data/step_up_trial1 \
-  /xbotcore/joint_states /mpc_solution
+  /xbotcore/joint_states /xbotcore/command
 ```
 
-Add actual IMU/base-state topics if the hardware publishes them. The replayer
-also writes measured joint feedback and references to its selected CSV file.
+Add actual IMU/base-state topics if available. Choose fresh recording/CSV names.
 
-## Completion and stopping
+## Stopping
 
-The standalone publisher requests a position hold with zero velocity,
-acceleration and feedforward effort when it finishes or is interrupted.
-The controller launch enables a 0.5 s wall-time command timeout with the same
-hold behavior if messages stop. A hold is not balance recovery or an emergency
-stop; use the robot's established stop procedure.
+Normal completion, Ctrl+C and handled errors request a position hold with zero
+velocity and feedforward effort. Gains remain at their last setting. The
+publisher also checks feedback age against a 0.5 s wall-time limit.
 
-Homing and zero-feedforward replay were exercised against MuJoCo. The optimized
-motion climbed using the experiment publisher. Full standalone feedforward
-replay, including its final zero-feedforward hold transition, still requires
-integration testing. Physical robot validation remains outstanding.
+There is no intermediary controller continuously forwarding the last message.
+If the publisher is forcibly killed, it cannot send its final hold; the response
+then depends on XBotCore and the hardware's configured failsafe. A position hold
+is not balance recovery or an emergency stop. Use the robot's established stop
+procedure. Physical robot operation has not been validated.

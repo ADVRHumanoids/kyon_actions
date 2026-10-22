@@ -1,29 +1,32 @@
-# Kyon motion replay — ROS 2
+# Kyon direct motion replay — ROS 2
 
-Run homing and saved MAT motions through an already running ROS 2 XBotCore.
-Use the [Docker instructions](docker/README.md) for building and
-running the replay container, and [REAL_ROBOT.md](REAL_ROBOT.md) for hardware
-setup and feedback checks. The controller and replayer use XBotCore's live
-URDF/SRDF; the container starts no hardware drivers or motion automatically.
+Home and replay a saved MAT trajectory directly through an already running
+XBotCore. Only this repository and one replay image are needed. There is no
+`kyon_controller`, Horizon, horizon_rti, phase_manager or CasADi dependency
+in the replay image.
+
+Follow [docker/README.md](docker/README.md) to build and run it. The publisher
+uses XBotCore's live URDF; it starts no hardware driver or motion automatically.
+[REAL_ROBOT.md](REAL_ROBOT.md) describes model, feedback and stop checks.
 
 ## Selected motion
 
 [step_up_30kg_optimized_v2.mat](mat_files/step_up_30kg_optimized_v2.mat):
 12 leg joints, no arms, 30 kg at the existing payload mount, 30 cm step,
-20.28 s duration. Total modeled mass is 98.654 kg. Replay with
-`--feedforward --rate 500`; the live model must match the MAT's URDF signature.
+20.28 s duration. Total modeled mass is 98.654 kg. It is the default file.
+Use `--feedforward` for the optimized torques; other files can be selected with `-f`.
 
-The optimization minimizes peak torque. Its selected feasible checkpoint has
-89.4 Nm predicted peak and passed dynamics and sampled mesh checks; the solver
-reached its iteration limit without proving optimality. MuJoCo replays completed
-once at a 115 Nm applied cap and once at 100 Nm. The 100 Nm replay had 7.0° peak
-joint error and 13.75 cm final body-position error. These are individual
-simulation runs, not hardware validation or a repeatability claim.
+The MAT includes exact signatures for the planning URDF and XBot's serialized
+export, with their corresponding masses. These allow validation of XBotCore's
+published model without a dynamics library. Motion arrays and planned torques
+are unchanged by this metadata addition. Unexpected models are rejected.
 
-[step_up_30kg_optimized_v2.yaml](config/step_up_30kg_optimized_v2.yaml) records
-the tested K=2000/D=120 simulation gains. The controller applies its selected
-YAML gains on the first trajectory message.
-No experimental 100 Nm cap is applied by the robot replay commands.
+[step_up_30kg_optimized_v2.yaml](config/step_up_30kg_optimized_v2.yaml) contains
+the K=2000/D=120 simulation profile. Pass it with `replay --config ...` to apply
+those gains; otherwise the publisher preserves the active gains. Homing also
+preserves the active gains. No experimental 100 Nm hardware cap is applied.
 
-The original MAT files are preserved. Experiments and generated results stay
-local; they are not required on the robot.
+The original MAT files are preserved. Tests, experiments and generated results
+stay local and are not needed in the replay image. Optional simulation/plotting
+commands can be installed outside this image with `INSTALL_SIMULATION_TOOLS=ON`;
+they require the separate simulation workspace. Physical replay remains unvalidated.

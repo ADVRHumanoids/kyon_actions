@@ -1,64 +1,43 @@
-# Step-up replay
+# Direct step-up replay
 
-XBotCore must already be running. This container uses its live URDF and feedback.
-Use `kyon_controller` branch `ros2-replay` and `kyon_actions` branch `ros2`,
-as sibling folders under `src/`.
+XBotCore must already be running. Only `kyon_actions` branch `ros2` is needed:
+no `kyon_controller`, Horizon, horizon_rti or phase_manager.
 
-## Build once on the robot PC
+## 1. Build one image
 
-From the workspace root:
+From the `kyon_actions` repository:
 
 ```bash
-docker build -f src/kyon_controller/docker/Dockerfile \
-  -t kyon-controller:latest src/kyon_controller
-docker build --network none -f src/kyon_actions/docker/Dockerfile \
-  -t kyon-replay:ros2 .
+docker build -f docker/Dockerfile -t kyon-replay:ros2 .
 ```
 
-## 1. Open the container and home
+## 2. Open the container
 
-From the workspace root, set the same ROS domain as XBotCore (replace `0`):
+Use XBotCore's ROS domain (replace `0`):
 
 ```bash
 export ROS_DOMAIN_ID=0
-mkdir -p artifacts/robot_replay
-cd src/kyon_actions/docker
-docker compose up -d --no-build
-docker compose exec replay kyon-replay-entrypoint bash
+mkdir -p recordings
+docker compose -f docker/compose.yaml up -d --no-build
+docker compose -f docker/compose.yaml exec replay kyon-replay-entrypoint bash
 ```
 
-Inside the container:
+## 3. Home and replay — same terminal
+
+The default file is `step_up_30kg_optimized_v2.mat`:
 
 ```bash
-MAT="$(ros2 pkg prefix --share kyon_actions)/mat_files/step_up_30kg_optimized_v2.mat"
-ros2 run kyon_actions replayer_ros2.py homing -f "$MAT" \
-  --output /data/homing_feedback.csv
+ros2 run kyon_actions replayer_ros2.py homing --output /data/homing_feedback.csv
+
+ros2 run kyon_actions replayer_ros2.py replay --feedforward \
+  --config "$(ros2 pkg prefix --share kyon_actions)/config/step_up_30kg_optimized_v2.yaml" \
+  --output /data/replay_feedback.csv
 ```
 
-## 2. Start the controller
+`--config` applies stiffness **2000** and damping **120** during replay; omit it
+to preserve the current gains. Homing preserves the current gains. References
+are sent directly to `/xbotcore/command` at 500 Hz. No separate controller launch.
 
-After homing, open a second host terminal in `workspace/src/kyon_actions/docker`.
-Use the same ROS domain:
-
-```bash
-export ROS_DOMAIN_ID=0
-docker compose exec replay kyon-replay-entrypoint bash
-ros2 launch kyon_actions controller_step_up.launch.py \
-  config:="$(ros2 pkg prefix --share kyon_actions)/config/step_up_30kg_optimized_v2.yaml" \
-  rate:=500
-```
-
-The included YAML sets stiffness **2000** and damping **120** when replay starts.
-
-## 3. Replay
-
-In the first container terminal, where `MAT` is defined:
-
-```bash
-ros2 run kyon_actions replayer_ros2.py replay -f "$MAT" \
-  --feedforward --rate 500 --output /data/replay_feedback.csv
-```
-
-Feedback is saved in `workspace/artifacts/robot_replay/`. Use fresh CSV names
-for each run. No experimental 100 Nm cap is applied. Hardware replay remains
-unvalidated; [REAL_ROBOT.md](../REAL_ROBOT.md) covers checks and stop behavior.
+CSV feedback is saved in `recordings/`; use new names for each run.
+No experimental 100 Nm cap is applied. See [REAL_ROBOT.md](../REAL_ROBOT.md)
+for model checks and stop behavior. Physical robot validation is outstanding.

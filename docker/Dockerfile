@@ -1,31 +1,41 @@
 # syntax=docker/dockerfile:1
-ARG CONTROLLER_IMAGE=kyon-controller:latest
-FROM ${CONTROLLER_IMAGE}
-
+FROM ros:jazzy-ros-base AS build
 SHELL ["/bin/bash", "-c"]
-WORKDIR /home/user/kyon_ws
 
-# Include the local ROS 2 changes and trajectories, including uncommitted files.
-COPY --chown=user:user src/kyon_controller/ src/kyon_controller/
-COPY --chown=user:user src/kyon_actions/ src/kyon_actions/
-
+# Only the XBot ROS interfaces are needed; no XBotCore or MPC stack is built.
+ARG XBOT_MSGS_REF=61f26da74039b921b3acdc61f1c12560dcf4b9d1
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      build-essential cmake git lsb-release && \
+    rm -rf /var/lib/apt/lists/* && \
+    git init /tmp/xbot_msgs && \
+    git -C /tmp/xbot_msgs remote add origin https://github.com/ADVRHumanoids/xbot_msgs.git && \
+    git -C /tmp/xbot_msgs fetch --depth 1 origin "${XBOT_MSGS_REF}" && \
+    git -C /tmp/xbot_msgs checkout --detach FETCH_HEAD
 RUN source /opt/ros/jazzy/setup.bash && \
-    source /opt/xbot/setup.sh && \
-    source /home/user/env/bin/activate && \
-    source /home/user/kyon_ws/setup.bash && \
-    cmake -S src/kyon_controller -B /tmp/kyon-controller-replay-build \
-      -DCMAKE_INSTALL_PREFIX=/home/user/kyon_ws/install \
-      -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF && \
-    cmake --build /tmp/kyon-controller-replay-build --parallel 4 && \
-    cmake --install /tmp/kyon-controller-replay-build && \
-    cmake -S src/kyon_actions -B /tmp/kyon-actions-replay-build \
-      -DCMAKE_INSTALL_PREFIX=/home/user/kyon_ws/install -DBUILD_TESTING=OFF && \
-    cmake --build /tmp/kyon-actions-replay-build --parallel 4 && \
-    cmake --install /tmp/kyon-actions-replay-build && \
-    rm -rf /tmp/kyon-controller-replay-build /tmp/kyon-actions-replay-build
+    cmake -S /tmp/xbot_msgs -B /tmp/xbot-msgs-build \
+      -DCMAKE_INSTALL_PREFIX=/opt/kyon-replay -DBUILD_TESTING=OFF && \
+    cmake --build /tmp/xbot-msgs-build --parallel 4 && \
+    cmake --install /tmp/xbot-msgs-build
 
-COPY --chmod=755 src/kyon_actions/docker/entrypoint.sh /usr/local/bin/kyon-replay-entrypoint
+COPY . /tmp/kyon_actions
+RUN source /opt/ros/jazzy/setup.bash && \
+    source /opt/kyon-replay/share/xbot_msgs/local_setup.bash && \
+    cmake -S /tmp/kyon_actions -B /tmp/kyon-actions-build \
+      -DCMAKE_INSTALL_PREFIX=/opt/kyon-replay -DINSTALL_SIMULATION_TOOLS=OFF && \
+    cmake --build /tmp/kyon-actions-build --parallel 4 && \
+    cmake --install /tmp/kyon-actions-build
+
+FROM ros:jazzy-ros-base
+SHELL ["/bin/bash", "-c"]
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      python3-numpy python3-scipy python3-yaml && \
+    rm -rf /var/lib/apt/lists/* && \
+    useradd --create-home --uid 1000 --non-unique replay && \
+    mkdir -p /data && chown replay:replay /data
+COPY --from=build /opt/kyon-replay /opt/kyon-replay
+COPY --chmod=755 docker/entrypoint.sh /usr/local/bin/kyon-replay-entrypoint
 ENV PYTHONDONTWRITEBYTECODE=1
+USER replay
 WORKDIR /data
 ENTRYPOINT ["/usr/local/bin/kyon-replay-entrypoint"]
 CMD ["bash"]

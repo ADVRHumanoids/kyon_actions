@@ -6,3 +6,4 @@ __pycache__/
 /install/
 /log/
 /test_*.py
+/recordings/

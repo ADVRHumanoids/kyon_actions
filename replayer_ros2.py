@@ -7,8 +7,9 @@ import time
 import xml.etree.ElementTree as ET
 
 import numpy as np
+import yaml
 
-from replay_sim_ros2 import JOINTS, joint_feedback, load_trajectory, package_directory
+from trajectory_io import JOINTS, joint_feedback, load_trajectory, package_directory
 
 
 def reference_at(data, dt, elapsed, hermite=False):
@@ -42,10 +43,15 @@ def feedforward_at(data, dt, elapsed):
 
 
 def validate_feedforward(urdf, data, live_mass):
-    signature = np.asarray(data.get('urdf_sha256', ''))
-    if signature.size != 1 or str(signature.item()) != hashlib.sha256(urdf.encode()).hexdigest():
-        raise ValueError('Feedforward requires the exact optimizer URDF signature; regenerate the plan for the live model')
-    mass = float(np.asarray(data['robot_mass']).item())
+    digest = hashlib.sha256(urdf.encode()).hexdigest()
+    for signature_key, mass_key in (('urdf_sha256', 'robot_mass'),
+                                    ('xbot_urdf_sha256', 'xbot_robot_mass')):
+        signature = np.asarray(data.get(signature_key, ''))
+        if signature.size == 1 and str(signature.item()) == digest and mass_key in data:
+            mass = float(np.asarray(data[mass_key]).item())
+            break
+    else:
+        raise ValueError('Feedforward requires the saved planning or XBot-export model signature')
     if not np.isfinite(mass) or abs(mass-live_mass) > 1e-6:
         raise ValueError('Feedforward trajectory mass differs from the live model')
     if np.max(np.abs(data['tau'][:6])) > 1.:
@@ -64,20 +70,54 @@ def homing_position(start, target, elapsed, duration):
 
 
 def validate_model(urdf, data):
-    from casadi_kin_dyn import pycasadi_kin_dyn
-    kd = pycasadi_kin_dyn.CasadiKinDyn(urdf)
-    if kd.nq() != 19 or kd.joint_names()[2:] != JOINTS:
-        raise ValueError('Live model must contain only the floating base and 12 leg joints')
     tree = ET.fromstring(urdf)
+    moving = [j for j in tree.findall('joint') if j.get('type') != 'fixed']
+    legs = [j for j in moving if j.get('type') == 'revolute']
+    if (len(moving) != 13 or len(legs) != 12
+            or sum(j.get('type') == 'floating' for j in moving) != 1
+            or {j.get('name') for j in legs} != set(JOINTS)):
+        raise ValueError('Live model must contain only the floating base and 12 leg joints')
     for index, name in enumerate(JOINTS):
         limit = tree.find(f"joint[@name='{name}']/limit")
+        lower, upper, speed = [float(limit.get(key)) for key in ('lower', 'upper', 'velocity')]
+        if not np.isfinite([lower, upper, speed]).all() or lower >= upper or speed <= 0:
+            raise ValueError(f'Invalid live joint limits for {name}')
         q = data['q'][index + 7]
         v = data['v'][index + 6]
-        if (q.min() < float(limit.get('lower')) - 1e-6 or
-                q.max() > float(limit.get('upper')) + 1e-6 or
-                np.max(np.abs(v)) > float(limit.get('velocity')) + 1e-6):
+        if q.min() < lower-1e-6 or q.max() > upper+1e-6 or np.max(np.abs(v)) > speed+1e-6:
             raise ValueError(f'Trajectory exceeds the live model limits for {name}')
-    return kd
+    masses = [float(mass.get('value')) for mass in tree.findall('link/inertial/mass')]
+    if not masses or not np.isfinite(masses).all() or min(masses) < 0 or sum(masses) <= 0:
+        raise ValueError('Live model must contain finite, nonnegative link masses')
+    return sum(masses)
+
+
+def load_gains(path):
+    config = yaml.safe_load(path.read_text())
+    if not isinstance(config, dict) or set(config) != {'stiffness', 'damping'}:
+        raise ValueError('Gain YAML must contain stiffness and damping only')
+    result = []
+    for field in ('stiffness', 'damping'):
+        if not isinstance(config[field], dict) or set(config[field]) != set(JOINTS):
+            raise ValueError(f'{field} must name exactly the 12 leg joints')
+        values = np.array([config[field][name] for name in JOINTS], dtype=float)
+        if not np.isfinite(values).all() or np.any(values < 0):
+            raise ValueError(f'{field} must be finite and nonnegative')
+        result.append(values)
+    return result
+
+
+def joint_command(q, v, feedforward=None, gains=None):
+    from xbot_msgs.msg import JointCommand
+    msg = JointCommand()
+    msg.name = JOINTS
+    msg.position = q[7:].astype(float).tolist()
+    msg.velocity = v[6:].astype(float).tolist()
+    msg.effort = [0.] * 12 if feedforward is None else feedforward[6:].astype(float).tolist()
+    msg.ctrl_mode = [7 if gains is None else 31] * 12  # q | v | effort, optionally K | D
+    if gains is not None:
+        msg.stiffness, msg.damping = (values.astype(float).tolist() for values in gains)
+    return msg
 
 
 def validate_homing(urdf, start, target, duration):
@@ -97,8 +137,6 @@ def run(args, data, dt, n):
     from rclpy.qos import QoSProfile, DurabilityPolicy, qos_profile_sensor_data
     from std_msgs.msg import String
     from xbot_msgs.msg import JointState, JointCommand
-    from kyon_controller.msg import WBTrajectory
-    from rcl_interfaces.srv import GetParameters
 
     rclpy.init(signal_handler_options=SignalHandlerOptions.NO)
     node = rclpy.create_node('kyon_mat_replayer')
@@ -123,7 +161,7 @@ def run(args, data, dt, n):
         deadline = time.monotonic() + timeout
         while not condition():
             if time.monotonic() > deadline:
-                raise TimeoutError('Live robot/controller did not become ready')
+                raise TimeoutError('Live XBotCore did not become ready')
             rclpy.spin_once(node, timeout_sec=.01)
 
     def measured():
@@ -134,38 +172,25 @@ def run(args, data, dt, n):
             raise ValueError('Joint feedback contains non-finite values')
         return values
 
-    def publish(q, v, a, feedforward=None):
+    def publish(q, v, feedforward=None):
         nonlocal sent, last_q
-        if args.mode == 'homing':
-            msg = JointCommand()
-            msg.name = JOINTS
-            msg.position = q[7:].astype(float).tolist()
-            # Position-only homing keeps zero velocity/effort references if the process is lost.
-            msg.velocity, msg.effort = [0.] * 12, [0.] * 12
-            msg.ctrl_mode = [7] * 12  # position | velocity | effort; preserve existing gains
-        else:
-            msg = WBTrajectory()
-            msg.header.frame_id = 'world'
-            msg.joint_names = JOINTS
-            msg.q, msg.v, msg.a = q.tolist(), v.tolist(), a.tolist()
-            msg.tau = [0.] * 18 if feedforward is None else feedforward.astype(float).tolist()
+        msg = joint_command(q, v, feedforward, args.gains)
         msg.header.stamp = node.get_clock().now().to_msg()
         publisher.publish(msg)
         last_q, sent = q.copy(), True
 
     try:
         wait_for(lambda: state['urdf'] is not None and state['joints'] is not None)
-        kd = validate_model(state['urdf'], data)
+        mass = validate_model(state['urdf'], data)
         if args.feedforward:
-            validate_feedforward(state['urdf'], data, float(kd.mass()))
+            validate_feedforward(state['urdf'], data, mass)
         q_measured, v_measured, _ = measured()
         if set(state['joints'].name) != set(JOINTS):
             raise ValueError('Joint feedback must contain exactly the 12 leg joints')
         if np.max(np.abs(v_measured)) > .2:
             raise ValueError('Robot must be stationary before homing or replay')
-        topic = '/xbotcore/command' if args.mode == 'homing' else '/mpc_solution'
-        publisher = node.create_publisher(JointCommand if args.mode == 'homing' else WBTrajectory,
-                                          topic, 1)
+        topic = '/xbotcore/command'
+        publisher = node.create_publisher(JointCommand, topic, 1)
         wait_for(lambda: publisher.get_subscription_count() > 0)
         # Allow discovery to expose any competing command source before the first command.
         deadline = time.monotonic() + .5
@@ -173,14 +198,6 @@ def run(args, data, dt, n):
             rclpy.spin_once(node, timeout_sec=.01)
         if node.count_publishers(topic) != 1:
             raise RuntimeError(f'Another command publisher is active on {topic}')
-        if args.mode == 'replay':
-            client = node.create_client(GetParameters, '/controller_node/get_parameters')
-            wait_for(client.service_is_ready)
-            request = GetParameters.Request(names=['command_timeout'])
-            future = client.call_async(request)
-            wait_for(future.done)
-            if not future.result().values or future.result().values[0].double_value <= 0:
-                raise RuntimeError('Start controller_step_up.launch.py with a positive command_timeout')
         q_measured, _, _ = measured()
         if args.mode == 'homing':
             validate_homing(state['urdf'], q_measured, data['q'][7:, 0], args.duration)
@@ -188,7 +205,7 @@ def run(args, data, dt, n):
             raise ValueError('Robot is not at the initial posture; run homing first')
         start_q = q_measured.copy()
         duration = args.duration if args.mode == 'homing' else n * dt
-        print(f'{args.mode}: {duration:.2f}s, live model {kd.mass():.3f} kg, 12 leg joints', flush=True)
+        print(f'{args.mode}: {duration:.2f}s, live model {mass:.3f} kg, 12 leg joints', flush=True)
         beginning = time.monotonic()
         next_tick = beginning
         while True:
@@ -203,8 +220,9 @@ def run(args, data, dt, n):
             if args.mode == 'homing':
                 q[7:] = homing_position(start_q, data['q'][7:, 0], elapsed, duration)
                 v[:], a[:] = 0., 0.
-            publish(q, v, a, feedforward)
-            records.append([elapsed, *q_measured, *v_measured, *torque, *q[7:], *v[6:]])
+            publish(q, v, feedforward)
+            records.append([elapsed, *q_measured, *v_measured, *torque, *q[7:], *v[6:],
+                            *([0.] * 12 if feedforward is None else feedforward[6:])])
             if elapsed >= duration + 1.:
                 if args.mode == 'homing' and np.max(np.abs(q_measured - data['q'][7:, 0])) > args.position_tolerance:
                     raise RuntimeError('Homing finished but measured joints did not reach the target tolerance')
@@ -217,11 +235,11 @@ def run(args, data, dt, n):
         if sent and publisher is not None and rclpy.ok():
             # Leave a position hold with zero velocity, acceleration, and feedforward effort.
             for _ in range(10):
-                publish(last_q, np.zeros(18), np.zeros(18))
+                publish(last_q, np.zeros(18))
                 time.sleep(.01)
         if records:
             args.output.parent.mkdir(parents=True, exist_ok=True)
-            header = ['time'] + [f'{field}_{name}' for field in ('q', 'v', 'torque', 'q_ref', 'v_ref')
+            header = ['time'] + [f'{field}_{name}' for field in ('q', 'v', 'torque', 'q_ref', 'v_ref', 'tau_ff')
                                 for name in JOINTS]
             np.savetxt(args.output, records, delimiter=',', header=','.join(header), comments='')
             print(f'Joint feedback saved to {args.output}', flush=True)
@@ -233,17 +251,21 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('mode', choices=('info', 'homing', 'replay'))
     parser.add_argument('-f', '--file', type=Path,
-                        default=package_directory() / 'mat_files/step_up_clearance.mat')
+                        default=package_directory() / 'mat_files/step_up_30kg_optimized_v2.mat')
     parser.add_argument('--duration', type=float, default=5., help='Homing duration in seconds')
-    parser.add_argument('--rate', type=float, default=200.)
+    parser.add_argument('--rate', type=float, default=500.)
     parser.add_argument('--position-tolerance', type=float, default=.05, help='Radians')
     parser.add_argument('--feedback-timeout', type=float, default=.5, help='Wall seconds')
     parser.add_argument('--output', type=Path)
+    parser.add_argument('--config', type=Path, help='Replay stiffness/damping YAML; omit to retain live gains')
     parser.add_argument('--feedforward', action='store_true',
                         help='Replay model-matched optimized torques and Hermite joint references; requires the exact live URDF')
     args = parser.parse_args()
     if args.feedforward and args.mode != 'replay':
         parser.error('--feedforward is only supported in replay mode')
+    if args.config and args.mode != 'replay':
+        parser.error('--config is only supported in replay mode')
+    args.gains = load_gains(args.config) if args.config else None
     if any(not np.isfinite(value) or value <= 0 for value in
            (args.duration, args.rate, args.position_tolerance, args.feedback_timeout)):
         parser.error('Duration, rate, position tolerance, and feedback timeout must be finite and positive')
