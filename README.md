@@ -13,10 +13,15 @@ and gain-file edits take effect on the next run without rebuilding.
 
 ## Selected motion
 
-[step_up_30kg_optimized_v2.mat](mat_files/step_up_30kg_optimized_v2.mat):
-12 leg joints, no arms, 30 kg at the existing payload mount, 30 cm step,
-20.28 s duration. Total modeled mass is 98.654 kg. It is the default file.
-Use `--feedforward` for the optimized torques; other files can be selected with `-f`.
+The [candidate collection](mat_files/candidates/README.md) contains the successful
+centred 30 kg trajectories and their MuJoCo results. Use the explicit `MAT`
+selection in [docker/README.md](docker/README.md) for both homing and replay.
+The latest full motion lasts 20.28 s; a 15.08 s front-right-finish option is
+also available. All use 12 leg joints, no arms, a 30 cm step and 10 cm clearance.
+The centred payload mount is `[0, 0, 0.20]` m relative to the pelvis.
+
+The command's unchanged default, `step_up_30kg_optimized_v2.mat`, uses the older
+rear payload mount `[-0.20, 0, 0.20]` m. Select centred motions with `-f`.
 
 The publisher checks the trajectory against the live joint limits. Feedforward
 requires a matching robot and payload; saved model signatures are not checked.

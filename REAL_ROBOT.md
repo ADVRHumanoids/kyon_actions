@@ -10,6 +10,9 @@ command publisher alongside this replayer.
 - Use the 12 leg joints, no arms and the 30 kg payload setup matching the MAT.
   Use feedforward only for a matching robot and payload; model signatures and
   payload mass are not checked. Live joint limits are checked.
+- Select the same MAT with `-f "$MAT"` for both homing and replay. Centred
+  candidates require payload mount `[0, 0, 0.20]` m relative to the pelvis;
+  omitting `-f` uses the older rear-payload default.
 - Homing preserves the live stiffness/damping and moves to the MAT's initial
   posture over five seconds. Replay requires initial joint error below 0.05 rad.
   The publisher rejects stale feedback; it does not detect competing publishers.

@@ -1,0 +1,510 @@
+{
+  "description": "Preserved MuJoCo climb candidates; solver convergence and simulation success are recorded separately.",
+  "catalogued_on": "2026-10-26",
+  "payload_kg": 30.0,
+  "arms": false,
+  "hardware_tested": false,
+  "default_replay_changed": false,
+  "workspace_paths_note": "Evidence paths are relative to the development workspace and are not packaged runtime dependencies.",
+  "candidates": [
+    {
+      "file": "step_up_30kg_centered_step30cm_order0321_landing_y_no_torque_cost_20261026.mat",
+      "status": "landing_y_no_torque_cost_baseline",
+      "source_workspace_path": "src/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_order0321_landing_y_no_torque_cost_20261026.mat",
+      "sha256": "70bbb9391d14a76a0cf7deb68be5f0c1c4d5749c8727d20deb93b2df470eb5fd",
+      "payload_position_m": [
+        0.0,
+        0.0,
+        0.2
+      ],
+      "step_height_m": 0.3,
+      "foot_clearance_m": 0.1,
+      "duration_s": 20.28,
+      "optimization": {
+        "generator": "original kyon_codesign fr_devel lower_body/_step_up.py",
+        "git_revision": "60f41ca315b86f9a47faca3f2654c63aebdbd361",
+        "optimizer_workspace_path": "artifacts/robot_deployment/centered_order0321_landing_y_no_torque_cost_30kg_trial1/optimizer_source.py",
+        "optimizer_sha256": "7e22173a3b0453d2e0090060abbf6b233b98ca716a47e6ff04f18eb12707e777",
+        "solver_status": "Solve_Succeeded",
+        "max_iterations": 500,
+        "linear_solver": "ma57",
+        "planned_peak_joint_torque_nm": 111.4314552542441,
+        "urdf_workspace_path": "artifacts/original_step_up/robot.urdf",
+        "urdf_sha256": "7ed0fb7fdbc2383b3d88c67b3c6eb5036ef37904d145f2ba97d61e544d088143",
+        "iterations": 51
+      },
+      "simulation": {
+        "successful_climbs": 1,
+        "trials": 1,
+        "measured_peak_joint_torque_nm": 136.5572509765625,
+        "peak_joint_error_deg": 4.3063864603688495,
+        "final_base_error_m": 0.03048467789352727,
+        "physical_effort_limit_nm": 185.0,
+        "applied_effort_limit_nm": 185.0,
+        "artificial_cap": false,
+        "feedforward": true,
+        "stiffness_nm_rad": 2000.0,
+        "damping_nm_s_rad": 120.0,
+        "rate_hz": 500.0,
+        "result_workspace_path": "artifacts/robot_deployment/centered_order0321_landing_y_no_torque_cost_30kg_trial1/result.json",
+        "final_hold_seconds_recorded": 4.841732971165328
+      },
+      "joint_position_bounds_enforced": true,
+      "torque_cost_enabled": false,
+      "lateral_landing_positions_preserved": true
+    },
+    {
+      "file": "step_up_30kg_centered_step30cm_clearance10cm_20261026.mat",
+      "status": "current_centered_payload_candidate",
+      "source_workspace_path": "src/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_clearance10cm_20261026.mat",
+      "sha256": "5d763ff5cff75c1953b265d36d856c9f1fb6eaa64bcaa47d878e291fa1381ec5",
+      "payload_position_m": [
+        0.0,
+        0.0,
+        0.2
+      ],
+      "step_height_m": 0.3,
+      "foot_clearance_m": 0.1,
+      "duration_s": 20.28,
+      "optimization": {
+        "generator": "original kyon_codesign fr_devel lower_body/_step_up.py",
+        "git_revision": "60f41ca315b86f9a47faca3f2654c63aebdbd361",
+        "optimizer_workspace_path": "artifacts/original_step_up/candidate_sources/step_up_30kg_centered_step30cm_clearance10cm_20261026.py",
+        "optimizer_sha256": "6dbcc90631178388257d36574c2b1f3a09d0189a63ba939f42b5c6a90bcc4809",
+        "solver_status": "Solve_Succeeded",
+        "iterations": 238,
+        "max_iterations": 500,
+        "linear_solver": "ma57",
+        "planned_peak_joint_torque_nm": 111.43146234407948,
+        "urdf_workspace_path": "artifacts/original_step_up/robot.urdf",
+        "urdf_sha256": "7ed0fb7fdbc2383b3d88c67b3c6eb5036ef37904d145f2ba97d61e544d088143",
+        "result_workspace_path": "artifacts/original_step_up/candidate_sources/step_up_30kg_centered_step30cm_clearance10cm_20261026.json"
+      },
+      "simulation": {
+        "successful_climbs": 1,
+        "trials": 1,
+        "measured_peak_joint_torque_nm": 131.1976776123047,
+        "peak_joint_error_deg": 4.020283496415355,
+        "final_base_error_m": 0.030403460946942556,
+        "physical_effort_limit_nm": 185.0,
+        "applied_effort_limit_nm": 185.0,
+        "artificial_cap": false,
+        "feedforward": true,
+        "stiffness_nm_rad": 2000.0,
+        "damping_nm_s_rad": 120.0,
+        "rate_hz": 500.0,
+        "result_workspace_path": "artifacts/robot_deployment/original_centered_30kg_trial1/result.json"
+      }
+    },
+    {
+      "file": "step_up_30kg_centered_step30cm_order0321_jointlimits_no_torque_cost_20261026.mat",
+      "status": "joint_limits_no_torque_cost_baseline",
+      "source_workspace_path": "src/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_order0321_jointlimits_no_torque_cost_20261026.mat",
+      "sha256": "35cd7773e92f8664f297270ddf2ddb981db8584c707341442e50e3e3e18a5b45",
+      "payload_position_m": [
+        0.0,
+        0.0,
+        0.2
+      ],
+      "step_height_m": 0.3,
+      "foot_clearance_m": 0.1,
+      "duration_s": 20.28,
+      "optimization": {
+        "generator": "original kyon_codesign fr_devel lower_body/_step_up.py",
+        "git_revision": "60f41ca315b86f9a47faca3f2654c63aebdbd361",
+        "optimizer_workspace_path": "artifacts/original_step_up/candidate_sources/step_up_30kg_centered_step30cm_order0321_jointlimits_no_torque_cost_20261026.py",
+        "optimizer_sha256": "7693231693e3b72c1dc6fafa2ba38100a3934072b84e2f599d57d61046ffb238",
+        "solver_status": "Success_required_by_export_driver",
+        "max_iterations": 500,
+        "linear_solver": "ma57",
+        "planned_peak_joint_torque_nm": 111.43145191807761,
+        "urdf_workspace_path": "artifacts/original_step_up/robot.urdf",
+        "urdf_sha256": "7ed0fb7fdbc2383b3d88c67b3c6eb5036ef37904d145f2ba97d61e544d088143"
+      },
+      "simulation": {
+        "successful_climbs": 1,
+        "trials": 1,
+        "measured_peak_joint_torque_nm": 135.8853759765625,
+        "peak_joint_error_deg": 3.168369369165297,
+        "final_base_error_m": 0.030500379005015985,
+        "physical_effort_limit_nm": 185.0,
+        "applied_effort_limit_nm": 185.0,
+        "artificial_cap": false,
+        "feedforward": true,
+        "stiffness_nm_rad": 2000.0,
+        "damping_nm_s_rad": 120.0,
+        "rate_hz": 500.0,
+        "result_workspace_path": "artifacts/robot_deployment/centered_order0321_full_no_torque_cost_30kg_trial1/result.json",
+        "final_hold_seconds_recorded": 4.81881588211283
+      },
+      "joint_position_bounds_enforced": true,
+      "torque_cost_enabled": false
+    },
+    {
+      "file": "step_up_30kg_centered_step30cm_stop_after_climb_20261026.mat",
+      "status": "short_centered_payload_candidate",
+      "source_workspace_path": "src/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_stop_after_climb_20261026.mat",
+      "sha256": "0fe09d86da5d8f89cdce8eb662ec85e91452ceb05f134a96c9c062173f70705a",
+      "payload_position_m": [
+        0.0,
+        0.0,
+        0.2
+      ],
+      "step_height_m": 0.3,
+      "foot_clearance_m": 0.1,
+      "duration_s": 13.88,
+      "optimization": {
+        "generator": "original kyon_codesign fr_devel lower_body/_step_up.py",
+        "git_revision": "60f41ca315b86f9a47faca3f2654c63aebdbd361",
+        "optimizer_workspace_path": "artifacts/original_step_up/candidate_sources/step_up_30kg_centered_step30cm_stop_after_climb_20261026.py",
+        "optimizer_sha256": "435e6ab4304509d88dcf66d02f4b3dde65b9eaf3da712de2ca91127513fd7b83",
+        "solver_status": "Solve_Succeeded",
+        "iterations": 15,
+        "max_iterations": 500,
+        "linear_solver": "ma57",
+        "planned_peak_joint_torque_nm": 120.40681241069746,
+        "urdf_workspace_path": "artifacts/original_step_up/robot.urdf",
+        "urdf_sha256": "7ed0fb7fdbc2383b3d88c67b3c6eb5036ef37904d145f2ba97d61e544d088143",
+        "result_workspace_path": "artifacts/original_step_up/candidate_sources/step_up_30kg_centered_step30cm_stop_after_climb_20261026.json",
+        "initial_guess": "q only from accepted full-length centred candidate",
+        "initial_guess_candidate_file": "step_up_30kg_centered_step30cm_clearance10cm_20261026.mat",
+        "initial_guess_mat_sha256": "5d763ff5cff75c1953b265d36d856c9f1fb6eaa64bcaa47d878e291fa1381ec5"
+      },
+      "simulation": {
+        "successful_climbs": 1,
+        "trials": 1,
+        "measured_peak_joint_torque_nm": 137.316162109375,
+        "peak_joint_error_deg": 3.5808513233315376,
+        "final_base_error_m": 0.0792790463460882,
+        "physical_effort_limit_nm": 185.0,
+        "applied_effort_limit_nm": 185.0,
+        "artificial_cap": false,
+        "feedforward": true,
+        "stiffness_nm_rad": 2000.0,
+        "damping_nm_s_rad": 120.0,
+        "rate_hz": 500.0,
+        "result_workspace_path": "artifacts/robot_deployment/original_centered_short_30kg_trial1/result.json",
+        "final_hold_seconds_recorded": 4.711672169975936
+      },
+      "foot_swings": 11
+    },
+    {
+      "file": "step_up_30kg_centered_step30cm_front_right_finish_20261026.mat",
+      "status": "front_right_finish_centered_payload_candidate",
+      "source_workspace_path": "src/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_front_right_finish_20261026.mat",
+      "sha256": "c1b978248282fe4d5f6f511d6040192ea129d25c9d45e02e9fce6b0a29192264",
+      "payload_position_m": [
+        0.0,
+        0.0,
+        0.2
+      ],
+      "step_height_m": 0.3,
+      "foot_clearance_m": 0.1,
+      "duration_s": 15.08,
+      "optimization": {
+        "generator": "original kyon_codesign fr_devel lower_body/_step_up.py",
+        "git_revision": "60f41ca315b86f9a47faca3f2654c63aebdbd361",
+        "optimizer_workspace_path": "artifacts/original_step_up/candidate_sources/step_up_30kg_centered_step30cm_front_right_finish_20261026.py",
+        "optimizer_sha256": "f588fef5b760e564d388f8bf3bf60d26ffe2b583cdca52d1a4099a0d7cfdc952",
+        "solver_status": "Solve_Succeeded",
+        "iterations": 15,
+        "max_iterations": 500,
+        "linear_solver": "ma57",
+        "planned_peak_joint_torque_nm": 117.84211592695998,
+        "urdf_workspace_path": "artifacts/original_step_up/robot.urdf",
+        "urdf_sha256": "7ed0fb7fdbc2383b3d88c67b3c6eb5036ef37904d145f2ba97d61e544d088143",
+        "result_workspace_path": "artifacts/original_step_up/candidate_sources/step_up_30kg_centered_step30cm_front_right_finish_20261026.json",
+        "initial_guess": "q only from accepted full-length centred candidate",
+        "initial_guess_candidate_file": "step_up_30kg_centered_step30cm_clearance10cm_20261026.mat",
+        "initial_guess_mat_sha256": "5d763ff5cff75c1953b265d36d856c9f1fb6eaa64bcaa47d878e291fa1381ec5"
+      },
+      "simulation": {
+        "successful_climbs": 1,
+        "trials": 1,
+        "measured_peak_joint_torque_nm": 130.739013671875,
+        "peak_joint_error_deg": 4.255680843517967,
+        "final_base_error_m": 0.023416414463145806,
+        "physical_effort_limit_nm": 185.0,
+        "applied_effort_limit_nm": 185.0,
+        "artificial_cap": false,
+        "feedforward": true,
+        "stiffness_nm_rad": 2000.0,
+        "damping_nm_s_rad": 120.0,
+        "rate_hz": 500.0,
+        "result_workspace_path": "artifacts/robot_deployment/centered_front_right_finish_30kg_trial1/result.json",
+        "final_hold_seconds_recorded": 4.731865327879786
+      },
+      "foot_swings": 12
+    },
+    {
+      "file": "step_up_30kg_centered_step30cm_order2301_20261026.mat",
+      "status": "gait_order2301_centered_payload_comparison",
+      "source_workspace_path": "src/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_order2301_20261026.mat",
+      "sha256": "0d50c5528033ea983c1badb054c9f3ac3a13b8c5f12f8cf0de3a136df6c2c700",
+      "payload_position_m": [
+        0.0,
+        0.0,
+        0.2
+      ],
+      "step_height_m": 0.3,
+      "foot_clearance_m": 0.1,
+      "duration_s": 15.08,
+      "optimization": {
+        "generator": "original kyon_codesign fr_devel lower_body/_step_up.py",
+        "git_revision": "60f41ca315b86f9a47faca3f2654c63aebdbd361",
+        "optimizer_workspace_path": "artifacts/original_step_up/candidate_sources/step_up_30kg_centered_step30cm_order2301_20261026.py",
+        "optimizer_sha256": "fb9a40ec44f2c5b3f57f251ecce7443ad2bf228ed607ee6f58bd6233fc17b82e",
+        "solver_status": "Solve_Succeeded",
+        "iterations": 19,
+        "max_iterations": 500,
+        "linear_solver": "ma57",
+        "planned_peak_joint_torque_nm": 105.3151907208753,
+        "urdf_workspace_path": "artifacts/original_step_up/robot.urdf",
+        "urdf_sha256": "7ed0fb7fdbc2383b3d88c67b3c6eb5036ef37904d145f2ba97d61e544d088143",
+        "result_workspace_path": "artifacts/original_step_up/candidate_sources/step_up_30kg_centered_step30cm_order2301_20261026.json",
+        "initial_guess": "q only from accepted full-length centred candidate",
+        "initial_guess_candidate_file": "step_up_30kg_centered_step30cm_clearance10cm_20261026.mat",
+        "initial_guess_mat_sha256": "5d763ff5cff75c1953b265d36d856c9f1fb6eaa64bcaa47d878e291fa1381ec5"
+      },
+      "simulation": {
+        "successful_climbs": 1,
+        "trials": 1,
+        "measured_peak_joint_torque_nm": 148.8871307373047,
+        "peak_joint_error_deg": 3.0995535057301264,
+        "final_base_error_m": 0.04765738342201207,
+        "physical_effort_limit_nm": 185.0,
+        "applied_effort_limit_nm": 185.0,
+        "artificial_cap": false,
+        "feedforward": true,
+        "stiffness_nm_rad": 2000.0,
+        "damping_nm_s_rad": 120.0,
+        "rate_hz": 500.0,
+        "result_workspace_path": "artifacts/robot_deployment/centered_order2301_30kg_trial1/result.json",
+        "final_hold_seconds_recorded": 4.693079979000613
+      },
+      "foot_swings": 12,
+      "cycle_order": [
+        2,
+        3,
+        0,
+        1
+      ]
+    },
+    {
+      "file": "step_up_30kg_centered_step30cm_order0123_20261026.mat",
+      "status": "gait_order0123_centered_payload_comparison",
+      "source_workspace_path": "src/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_order0123_20261026.mat",
+      "sha256": "79aab2cd72cbefda163f2db3fb85af08fdba47f74ea5dd7f9c21b94ad9592eca",
+      "payload_position_m": [
+        0.0,
+        0.0,
+        0.2
+      ],
+      "step_height_m": 0.3,
+      "foot_clearance_m": 0.1,
+      "duration_s": 15.08,
+      "optimization": {
+        "generator": "original kyon_codesign fr_devel lower_body/_step_up.py",
+        "git_revision": "60f41ca315b86f9a47faca3f2654c63aebdbd361",
+        "optimizer_workspace_path": "artifacts/original_step_up/candidate_sources/step_up_30kg_centered_step30cm_order0123_20261026.py",
+        "optimizer_sha256": "cd34dda77b18dede6f5c14e758b8a84c6a3450de703eb517850975001c61c9e1",
+        "solver_status": "Solve_Succeeded",
+        "iterations": 17,
+        "max_iterations": 500,
+        "linear_solver": "ma57",
+        "planned_peak_joint_torque_nm": 130.8577431997419,
+        "urdf_workspace_path": "artifacts/original_step_up/robot.urdf",
+        "urdf_sha256": "7ed0fb7fdbc2383b3d88c67b3c6eb5036ef37904d145f2ba97d61e544d088143",
+        "result_workspace_path": "artifacts/original_step_up/candidate_sources/step_up_30kg_centered_step30cm_order0123_20261026.json",
+        "initial_guess": "q only from accepted full-length centred candidate",
+        "initial_guess_candidate_file": "step_up_30kg_centered_step30cm_clearance10cm_20261026.mat",
+        "initial_guess_mat_sha256": "5d763ff5cff75c1953b265d36d856c9f1fb6eaa64bcaa47d878e291fa1381ec5"
+      },
+      "simulation": {
+        "successful_climbs": 1,
+        "trials": 1,
+        "measured_peak_joint_torque_nm": 155.6820068359375,
+        "peak_joint_error_deg": 3.245446346401599,
+        "final_base_error_m": 0.0758665034294093,
+        "physical_effort_limit_nm": 185.0,
+        "applied_effort_limit_nm": 185.0,
+        "artificial_cap": false,
+        "feedforward": true,
+        "stiffness_nm_rad": 2000.0,
+        "damping_nm_s_rad": 120.0,
+        "rate_hz": 500.0,
+        "result_workspace_path": "artifacts/robot_deployment/centered_order0123_30kg_trial1/result.json",
+        "final_hold_seconds_recorded": 4.750619123997167
+      },
+      "foot_swings": 12,
+      "cycle_order": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "file": "step_up_30kg_centered_step30cm_order2301_full_20261026.mat",
+      "status": "gait_order2301_full_centered_payload_comparison",
+      "source_workspace_path": "src/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_order2301_full_20261026.mat",
+      "sha256": "f7cc5c9d3bef2826cd5b088ebbde4f7b23568487e83eb81d2dea5eaec3280199",
+      "payload_position_m": [
+        0.0,
+        0.0,
+        0.2
+      ],
+      "step_height_m": 0.3,
+      "foot_clearance_m": 0.1,
+      "duration_s": 20.28,
+      "optimization": {
+        "generator": "original kyon_codesign fr_devel lower_body/_step_up.py",
+        "git_revision": "60f41ca315b86f9a47faca3f2654c63aebdbd361",
+        "optimizer_workspace_path": "artifacts/original_step_up/candidate_sources/step_up_30kg_centered_step30cm_order2301_full_20261026.py",
+        "optimizer_sha256": "fe40bebf90056ffe29290ceb07717dcaac63e2bc6916af95ac8401d6454b1345",
+        "solver_status": "Solve_Succeeded",
+        "iterations": 24,
+        "max_iterations": 500,
+        "linear_solver": "ma57",
+        "planned_peak_joint_torque_nm": 101.64585290982822,
+        "urdf_workspace_path": "artifacts/original_step_up/robot.urdf",
+        "urdf_sha256": "7ed0fb7fdbc2383b3d88c67b3c6eb5036ef37904d145f2ba97d61e544d088143",
+        "result_workspace_path": "artifacts/original_step_up/candidate_sources/step_up_30kg_centered_step30cm_order2301_full_20261026.json",
+        "initial_guess": "q only from accepted full-length centred candidate",
+        "initial_guess_candidate_file": "step_up_30kg_centered_step30cm_clearance10cm_20261026.mat",
+        "initial_guess_mat_sha256": "5d763ff5cff75c1953b265d36d856c9f1fb6eaa64bcaa47d878e291fa1381ec5"
+      },
+      "simulation": {
+        "successful_climbs": 1,
+        "trials": 1,
+        "measured_peak_joint_torque_nm": 158.98379516601562,
+        "peak_joint_error_deg": 7.26863267321421,
+        "final_base_error_m": 0.054501778967823884,
+        "physical_effort_limit_nm": 185.0,
+        "applied_effort_limit_nm": 185.0,
+        "artificial_cap": false,
+        "feedforward": true,
+        "stiffness_nm_rad": 2000.0,
+        "damping_nm_s_rad": 120.0,
+        "rate_hz": 500.0,
+        "result_workspace_path": "artifacts/robot_deployment/centered_order2301_full_30kg_trial1/result.json",
+        "final_hold_seconds_recorded": 4.899079231107606
+      },
+      "foot_swings": 16,
+      "cycle_order": [
+        2,
+        3,
+        0,
+        1
+      ]
+    },
+    {
+      "file": "../step_up_30kg_optimized_v2.mat",
+      "status": "historical_rear_payload_comparison",
+      "source_workspace_path": "src/kyon_actions/mat_files/step_up_30kg_optimized_v2.mat",
+      "sha256": "ebc8b77fe910325f0f6f116ee6053c8ec5272a2bf7f2d178032b688a3da4eb9e",
+      "payload_position_m": [
+        -0.2,
+        0.0,
+        0.2
+      ],
+      "step_height_m": 0.3,
+      "duration_s": 20.28,
+      "optimization": {
+        "solver_status": "Maximum_Iterations_Exceeded",
+        "optimality_converged": false,
+        "planned_peak_joint_torque_nm": 89.38901572158937,
+        "result_workspace_path": "artifacts/original_step_up/candidate_sources/step_up_30kg_rear_peak_torque_v2.optimization.json"
+      },
+      "simulation": {
+        "successful_climbs": 1,
+        "trials": 1,
+        "measured_peak_joint_torque_nm": 115.0,
+        "peak_joint_error_deg": 10.645810789463043,
+        "final_base_error_m": 0.1372613560212545,
+        "physical_effort_limit_nm": 185.0,
+        "applied_effort_limit_nm": 115.0,
+        "artificial_cap": true,
+        "feedforward": true,
+        "stiffness_nm_rad": 2000.0,
+        "damping_nm_s_rad": 120.0,
+        "result_workspace_path": "artifacts/original_step_up/candidate_sources/step_up_30kg_rear_peak_torque_v2.replay.json"
+      }
+    },
+    {
+      "file": "../step_up_30kg_optimized_seed.mat",
+      "status": "historical_rear_payload_comparison",
+      "source_workspace_path": "src/kyon_actions/mat_files/step_up_30kg_optimized_seed.mat",
+      "sha256": "aaf4e3d43ab2713ad4ddf0677d9013706cc2bb4151973dbde6f9fc39c7715406",
+      "payload_position_m": [
+        -0.2,
+        0.0,
+        0.2
+      ],
+      "step_height_m": 0.3,
+      "duration_s": 20.28,
+      "optimization": {
+        "solver_status": "NonIpopt_Exception_Thrown",
+        "optimality_converged": false,
+        "planned_peak_joint_torque_nm": 136.56021193331827,
+        "result_workspace_path": "artifacts/original_step_up/candidate_sources/step_up_30kg_rear_optimized_seed.optimization.json"
+      },
+      "simulation": {
+        "successful_climbs": 1,
+        "trials": 1,
+        "measured_peak_joint_torque_nm": 115.0,
+        "peak_joint_error_deg": 7.2122068668475885,
+        "final_base_error_m": 0.10607131368322838,
+        "physical_effort_limit_nm": 185.0,
+        "applied_effort_limit_nm": 115.0,
+        "artificial_cap": true,
+        "feedforward": true,
+        "stiffness_nm_rad": 2000.0,
+        "damping_nm_s_rad": 120.0,
+        "result_workspace_path": "artifacts/original_step_up/candidate_sources/step_up_30kg_rear_optimized_seed.replay.json"
+      }
+    },
+    {
+      "file": "../step_up_30kg_candidate_v1.mat",
+      "status": "historical_rear_payload_comparison",
+      "source_workspace_path": "src/kyon_actions/mat_files/step_up_30kg_candidate_v1.mat",
+      "sha256": "a9232e68a583ed57f8f4e26903bf5c44959c6e879dd5ec9208767a99fc373694",
+      "payload_position_m": [
+        -0.2,
+        0.0,
+        0.2
+      ],
+      "step_height_m": 0.3,
+      "duration_s": 20.28,
+      "optimization": {
+        "solver_status": "manual_body_corrections",
+        "optimality_converged": null,
+        "planned_peak_joint_torque_nm": null,
+        "result_workspace_path": null
+      },
+      "simulation": {
+        "successful_climbs": 3,
+        "trials": 3,
+        "measured_peak_joint_torque_nm": 115.0,
+        "peak_joint_error_deg": 13.450535948243404,
+        "final_base_error_m": 0.12145259143885852,
+        "physical_effort_limit_nm": 185.0,
+        "applied_effort_limit_nm": 115.0,
+        "artificial_cap": true,
+        "feedforward": false,
+        "stiffness_nm_rad": 2000.0,
+        "damping_nm_s_rad": 120.0,
+        "result_workspace_path": "artifacts/trajectory_refinement/candidate_v1_115_trial3/result.json",
+        "result_workspace_paths": [
+          "artifacts/trajectory_refinement/back10_forward25_up10_115_trial1/result.json",
+          "artifacts/trajectory_refinement/back10_forward25_up10_115_trial2/result.json",
+          "artifacts/trajectory_refinement/candidate_v1_115_trial3/result.json"
+        ]
+      },
+      "limitations": [
+        "Manually modified trajectory; reference clearance check fails.",
+        "Not selected for the centred payload."
+      ]
+    }
+  ]
+}
