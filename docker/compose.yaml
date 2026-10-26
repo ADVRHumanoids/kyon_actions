@@ -15,7 +15,6 @@ services:
       ROS_DOMAIN_ID: ${ROS_DOMAIN_ID:?Set the ROS domain used by the robot XBot stack}
     volumes:
       - ..:/workspace/kyon_actions
-      - ${REPLAY_DATA_DIR:-../recordings}:/data
     command: ["sleep", "infinity"]
     restart: "no"
     stdin_open: true

@@ -120,7 +120,6 @@ def run(args, data, dt, n):
     node = rclpy.create_node('kyon_mat_replayer')
     state = {'urdf': None, 'joints': None, 'received': None}
     last_q = None
-    records = []
     target = data['q'][7:, 0]
 
     def feedback(message):
@@ -174,7 +173,7 @@ def run(args, data, dt, n):
         while True:
             rclpy.spin_once(node, timeout_sec=0)
             now = time.monotonic()
-            q_measured, v_measured, torque = measured()
+            q_measured, _, _ = measured()
             elapsed = now - beginning
             q, v, _ = reference_at(data, dt, elapsed if args.mode == 'replay' else 0., hermite=args.feedforward)
             feedforward = feedforward_at(data, dt, elapsed) if args.feedforward else None
@@ -182,8 +181,6 @@ def run(args, data, dt, n):
                 q[7:] = homing_position(start_q, target, elapsed, duration)
                 v[:] = 0.
             publish(q, v, feedforward)
-            records.append([elapsed, *q_measured, *v_measured, *torque, *q[7:], *v[6:],
-                            *([0.] * 12 if feedforward is None else feedforward[6:])])
             if elapsed >= duration + 1.:
                 if args.mode == 'homing' and np.max(np.abs(q_measured - target)) > args.position_tolerance:
                     raise RuntimeError('Homing finished but measured joints did not reach the target tolerance')
@@ -198,12 +195,6 @@ def run(args, data, dt, n):
             for _ in range(10):
                 publish(last_q, np.zeros(18))
                 time.sleep(.01)
-        if records:
-            args.output.parent.mkdir(parents=True, exist_ok=True)
-            header = ['time'] + [f'{field}_{name}' for field in ('q', 'v', 'torque', 'q_ref', 'v_ref', 'tau_ff')
-                                for name in JOINTS]
-            np.savetxt(args.output, records, delimiter=',', header=','.join(header), comments='')
-            print(f'Joint feedback saved to {args.output}', flush=True)
         node.destroy_node()
         rclpy.shutdown()
 
@@ -217,7 +208,6 @@ def main():
     parser.add_argument('--rate', type=float, default=500.)
     parser.add_argument('--position-tolerance', type=float, default=.05, help='Radians')
     parser.add_argument('--feedback-timeout', type=float, default=.5, help='Wall seconds')
-    parser.add_argument('--output', type=Path)
     parser.add_argument('--config', type=Path, help='Replay stiffness/damping YAML; omit to retain live gains')
     parser.add_argument('--feedforward', action='store_true',
                         help='Replay saved torques and Hermite joint references; use only model-matched torques')
@@ -235,7 +225,6 @@ def main():
         print(f'{args.file}: {n} intervals, dt={dt:g}s, duration={n * dt:g}s')
         print(dict(zip(JOINTS, data['q'][7:, 0])))
         return 0
-    args.output = args.output or Path(f'{args.mode}_feedback.csv')
     try:
         run(args, data, dt, n)
     except KeyboardInterrupt:

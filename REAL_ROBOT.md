@@ -22,22 +22,13 @@ command publisher alongside this replayer.
   existing XBotCore setup. The replay image does not change the URDF or install
   a 100 Nm effort ceiling.
 
-## Inspect and record
+## Inspect
 
 Inside the container, inspect current joint positions, velocities, efforts and gains:
 
 ```bash
 ros2 topic echo /xbotcore/joint_states --once
 ```
-
-For a complete recording, in another container shell:
-
-```bash
-ros2 bag record -o /data/step_up_trial1 \
-  /xbotcore/joint_states /xbotcore/command
-```
-
-Add actual IMU/base-state topics if available. Choose fresh recording/CSV names.
 
 ## Stopping
 

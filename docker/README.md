@@ -17,7 +17,6 @@ Use XBotCore's ROS domain (replace `0`):
 
 ```bash
 export ROS_DOMAIN_ID=0
-mkdir -p recordings
 docker compose -f docker/compose.yaml up -d --no-build
 docker compose -f docker/compose.yaml exec replay kyon-replay-entrypoint bash
 ```
@@ -35,12 +34,10 @@ for the **centred 30 kg payload**, 30 cm step and 10 cm clearance:
 MAT="/workspace/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_order0321_landing_y_no_torque_cost_20261026.mat"
 
 ros2 run kyon_actions replayer_ros2.py info -f "$MAT"
-ros2 run kyon_actions replayer_ros2.py homing -f "$MAT" \
-  --output /data/homing_feedback.csv
+ros2 run kyon_actions replayer_ros2.py homing -f "$MAT"
 
 ros2 run kyon_actions replayer_ros2.py replay -f "$MAT" --feedforward \
-  --config config/step_up_30kg_optimized_v2.yaml \
-  --output /data/replay_feedback.csv
+  --config config/step_up_30kg_optimized_v2.yaml
 ```
 
 `--config` applies stiffness **2000** and damping **120** during replay; omit it
@@ -52,6 +49,5 @@ in [the candidate table](../mat_files/candidates/README.md). The centred payload
 mount is `[0, 0, 0.20]` m relative to the pelvis. Omitting `-f` selects the older
 rear-payload motion. The repository mount exposes new MATs without rebuilding.
 
-CSV feedback is saved in `recordings/`; use new names for each run.
 No experimental 100 Nm cap is applied. See [REAL_ROBOT.md](../REAL_ROBOT.md)
 for model checks and stop behavior. Physical robot validation is outstanding.
