@@ -54,6 +54,62 @@
       "lateral_landing_positions_preserved": true
     },
     {
+      "file": "step_up_30kg_centered_step30cm_order0321_com_margin1cm_20261026.mat",
+      "status": "com_support_margin_comparison",
+      "source_workspace_path": "src/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_order0321_com_margin1cm_20261026.mat",
+      "sha256": "85f25412d0a1fd8b9d5c997bb0df9bc4f9360a2a2a02586ea08cdf4efb50ea2f",
+      "payload_position_m": [
+        0.0,
+        0.0,
+        0.2
+      ],
+      "step_height_m": 0.3,
+      "foot_clearance_m": 0.1,
+      "duration_s": 20.28,
+      "optimization": {
+        "generator": "original kyon_codesign fr_devel lower_body/_step_up.py",
+        "git_revision": "60f41ca315b86f9a47faca3f2654c63aebdbd361",
+        "optimizer_workspace_path": "artifacts/original_step_up/candidate_sources/step_up_30kg_centered_step30cm_order0321_com_margin1cm_20261026.py",
+        "optimizer_sha256": "146c2a14d1858b3a6baf668553a2e1ef2d3c1095a24d79d91f246a9f424068a9",
+        "solver_status": "Solve_Succeeded",
+        "max_iterations": 500,
+        "linear_solver": "ma57",
+        "planned_peak_joint_torque_nm": 115.99284390392174,
+        "urdf_workspace_path": "artifacts/original_step_up/robot.urdf",
+        "urdf_sha256": "7ed0fb7fdbc2383b3d88c67b3c6eb5036ef37904d145f2ba97d61e544d088143",
+        "iterations": 35,
+        "result_workspace_path": "artifacts/robot_deployment/centered_order0321_com_support_30kg_trial1/optimization_result.json"
+      },
+      "simulation": {
+        "successful_climbs": 1,
+        "trials": 1,
+        "measured_peak_joint_torque_nm": 142.19703674316406,
+        "peak_joint_error_deg": 5.6612979162134485,
+        "final_base_error_m": 0.03373808430440976,
+        "physical_effort_limit_nm": 185.0,
+        "applied_effort_limit_nm": 185.0,
+        "artificial_cap": false,
+        "feedforward": true,
+        "stiffness_nm_rad": 2000.0,
+        "damping_nm_s_rad": 120.0,
+        "rate_hz": 500.0,
+        "result_workspace_path": "artifacts/robot_deployment/centered_order0321_com_support_30kg_trial1/result.json",
+        "final_hold_seconds_recorded": 4.365467065973206
+      },
+      "joint_position_bounds_enforced": true,
+      "torque_cost_enabled": false,
+      "lateral_landing_positions_preserved": true,
+      "com_support_margin_m": 0.01,
+      "com_support_interval_s": [
+        13.0,
+        13.76
+      ],
+      "limitations": [
+        "Single successful MuJoCo replay; measured peak exceeds the lateral-landing baseline.",
+        "COM constraint covers only contact_3 climb at 13.00\u201313.76 s; not a guarantee of whole-motion stability."
+      ]
+    },
+    {
       "file": "step_up_30kg_centered_step30cm_clearance10cm_20261026.mat",
       "status": "current_centered_payload_candidate",
       "source_workspace_path": "src/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_clearance10cm_20261026.mat",
@@ -504,6 +560,333 @@
       "limitations": [
         "Manually modified trajectory; reference clearance check fails.",
         "Not selected for the centred payload."
+      ]
+    },
+    {
+      "file": "step_up_30kg_centered_step30cm_front_right_finish_bodytrack_tau001_20261026.mat",
+      "status": "short_body_tracking_torque_cost_comparison",
+      "source_workspace_path": "src/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_front_right_finish_bodytrack_tau001_20261026.mat",
+      "sha256": "dd4fb72423bfddc81721257feaa9a8f017d24b3c8f8649136ecd735d5b628b46",
+      "payload_position_m": [
+        0.0,
+        0.0,
+        0.2
+      ],
+      "step_height_m": 0.3,
+      "foot_clearance_m": 0.1,
+      "duration_s": 15.08,
+      "optimization": {
+        "generator": "original kyon_codesign fr_devel lower_body/_step_up.py",
+        "git_revision": "60f41ca315b86f9a47faca3f2654c63aebdbd361",
+        "optimizer_workspace_path": "artifacts/original_step_up/candidate_sources/step_up_30kg_centered_step30cm_front_right_finish_bodytrack_tau001_20261026.py",
+        "optimizer_sha256": "536c13e1da527a5003f8abacba15a42f06b027f95c88914470094b12a9157e14",
+        "solver_status": "Solve_Succeeded",
+        "max_iterations": 500,
+        "linear_solver": "ma57",
+        "planned_peak_joint_torque_nm": 115.58696695426248,
+        "urdf_workspace_path": "artifacts/original_step_up/robot.urdf",
+        "urdf_sha256": "7ed0fb7fdbc2383b3d88c67b3c6eb5036ef37904d145f2ba97d61e544d088143",
+        "iterations": 41,
+        "result_workspace_path": "artifacts/robot_deployment/centered_order0321_front_finish_bodytrack_tau001_30kg_trial1/optimization_result.json"
+      },
+      "simulation": {
+        "successful_climbs": 1,
+        "trials": 1,
+        "measured_peak_joint_torque_nm": 163.06361389160156,
+        "peak_joint_error_deg": 4.9731222063888145,
+        "final_base_error_m": 0.0377403811833966,
+        "physical_effort_limit_nm": 185.0,
+        "applied_effort_limit_nm": 185.0,
+        "artificial_cap": false,
+        "feedforward": true,
+        "stiffness_nm_rad": 2000.0,
+        "damping_nm_s_rad": 120.0,
+        "rate_hz": 500.0,
+        "result_workspace_path": "artifacts/robot_deployment/centered_order0321_front_finish_bodytrack_tau001_30kg_trial1/result.json",
+        "final_hold_seconds_recorded": 4.360522914053872
+      },
+      "joint_position_bounds_enforced": true,
+      "torque_cost_enabled": true,
+      "lateral_landing_positions_preserved": true,
+      "com_support_margin_m": 0.01,
+      "com_support_interval_s": [
+        13.0,
+        13.76
+      ],
+      "limitations": [
+        "Single successful MuJoCo replay; measured peak 163.1 Nm exceeds the original short finishing-step candidate at 130.7 Nm.",
+        "Aligned finishing stance, not exact homing; final measured front foot x difference 5.2 cm."
+      ],
+      "torque_residual_weight": 0.001,
+      "body_tracking_residual_weight": 10.0,
+      "foot_swings": 12,
+      "cycle_order": [
+        0,
+        3,
+        2,
+        1
+      ]
+    },
+    {
+      "file": "step_up_30kg_centered_step30cm_front_right_finish_force_smooth003_20261026.mat",
+      "status": "short_force_smoothing_comparison",
+      "source_workspace_path": "src/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_front_right_finish_force_smooth003_20261026.mat",
+      "sha256": "9aeb133fb8ab832c4e8ca8ca3456c35521edc2172924a9f927a3c671ce4f694f",
+      "payload_position_m": [
+        0.0,
+        0.0,
+        0.2
+      ],
+      "step_height_m": 0.3,
+      "foot_clearance_m": 0.1,
+      "duration_s": 15.08,
+      "optimization": {
+        "generator": "original kyon_codesign fr_devel lower_body/_step_up.py",
+        "git_revision": "60f41ca315b86f9a47faca3f2654c63aebdbd361",
+        "optimizer_workspace_path": "artifacts/original_step_up/candidate_sources/step_up_30kg_centered_step30cm_front_right_finish_force_smooth003_20261026.py",
+        "optimizer_sha256": "3a7062e69175806ca3429e7b09b2ce6f693bdd982910225d53e059245631bfef",
+        "solver_status": "Solve_Succeeded",
+        "max_iterations": 500,
+        "linear_solver": "ma57",
+        "planned_peak_joint_torque_nm": 116.50537320658646,
+        "urdf_workspace_path": "artifacts/original_step_up/robot.urdf",
+        "urdf_sha256": "7ed0fb7fdbc2383b3d88c67b3c6eb5036ef37904d145f2ba97d61e544d088143",
+        "iterations": 32,
+        "result_workspace_path": "artifacts/robot_deployment/centered_order0321_front_finish_force_smooth003_30kg_trial1/optimization_result.json"
+      },
+      "simulation": {
+        "successful_climbs": 1,
+        "trials": 1,
+        "measured_peak_joint_torque_nm": 154.33213806152344,
+        "peak_joint_error_deg": 10.454403656837407,
+        "final_base_error_m": 0.031008913286328748,
+        "physical_effort_limit_nm": 185.0,
+        "applied_effort_limit_nm": 185.0,
+        "artificial_cap": false,
+        "feedforward": true,
+        "stiffness_nm_rad": 2000.0,
+        "damping_nm_s_rad": 120.0,
+        "rate_hz": 500.0,
+        "result_workspace_path": "artifacts/robot_deployment/centered_order0321_front_finish_force_smooth003_30kg_trial1/result.json",
+        "final_hold_seconds_recorded": 4.359326135907322
+      },
+      "joint_position_bounds_enforced": true,
+      "torque_cost_enabled": false,
+      "lateral_landing_positions_preserved": true,
+      "com_support_margin_m": 0.01,
+      "com_support_interval_s": [
+        13.0,
+        13.76
+      ],
+      "limitations": [
+        "Single successful MuJoCo replay; measured peak 154.3 Nm exceeds the original short finishing-step candidate at 130.7 Nm.",
+        "Peak joint error 10.5 degrees; worse than the prior body-tracking torque-cost comparison."
+      ],
+      "body_tracking_residual_weight": 10.0,
+      "foot_swings": 12,
+      "cycle_order": [
+        0,
+        3,
+        2,
+        1
+      ],
+      "force_smoothing_residual_weight": 0.003
+    },
+    {
+      "file": "step_up_30kg_centered_step30cm_front_right_finish_stance600ms_20261026.mat",
+      "status": "longer_stance_finishing_step_comparison",
+      "source_workspace_path": "src/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_front_right_finish_stance600ms_20261026.mat",
+      "sha256": "2dcd5d81e0d245cb175fcbf839f257d96cb32f910db3c053b8a669f6a2987f52",
+      "payload_position_m": [
+        0.0,
+        0.0,
+        0.2
+      ],
+      "step_height_m": 0.3,
+      "foot_clearance_m": 0.1,
+      "duration_s": 17.28,
+      "optimization": {
+        "generator": "original kyon_codesign fr_devel lower_body/_step_up.py",
+        "git_revision": "60f41ca315b86f9a47faca3f2654c63aebdbd361",
+        "optimizer_workspace_path": "artifacts/original_step_up/candidate_sources/step_up_30kg_centered_step30cm_front_right_finish_stance600ms_20261026.py",
+        "optimizer_sha256": "280b9c6c8329068dec8bc7446977e2e100a91479ac2665f40416d1e1401dad38",
+        "solver_status": "Solve_Succeeded",
+        "iterations": 33,
+        "max_iterations": 500,
+        "linear_solver": "ma57",
+        "planned_peak_joint_torque_nm": 120.8822327454552,
+        "urdf_workspace_path": "artifacts/original_step_up/robot.urdf",
+        "urdf_sha256": "7ed0fb7fdbc2383b3d88c67b3c6eb5036ef37904d145f2ba97d61e544d088143",
+        "result_workspace_path": "artifacts/robot_deployment/centered_order0321_front_finish_stance06_30kg_trial1/optimization_result.json",
+        "initial_guess": "q only from accepted full-length centred candidate",
+        "initial_guess_candidate_file": "step_up_30kg_centered_step30cm_clearance10cm_20261026.mat",
+        "initial_guess_mat_sha256": "5d763ff5cff75c1953b265d36d856c9f1fb6eaa64bcaa47d878e291fa1381ec5",
+        "initial_guess_workspace_path": "artifacts/robot_deployment/centered_order0321_front_finish_stance06_30kg_trial1/initial_guess.mat",
+        "initial_guess_note": "Positions from accepted short finishing-step MAT; phase mapping preserves swings and extends dwell intervals."
+      },
+      "simulation": {
+        "successful_climbs": 1,
+        "trials": 1,
+        "measured_peak_joint_torque_nm": 145.80392456054688,
+        "peak_joint_error_deg": 2.950484627094598,
+        "final_base_error_m": 0.04633008974886761,
+        "physical_effort_limit_nm": 185.0,
+        "applied_effort_limit_nm": 185.0,
+        "artificial_cap": false,
+        "feedforward": true,
+        "stiffness_nm_rad": 2000.0,
+        "damping_nm_s_rad": 120.0,
+        "rate_hz": 500.0,
+        "result_workspace_path": "artifacts/robot_deployment/centered_order0321_front_finish_stance06_30kg_trial1/result.json",
+        "final_hold_seconds_recorded": 4.366362794796004
+      },
+      "foot_swings": 12,
+      "double_stance_time_s": 0.6,
+      "contact_flight_time_s": 0.8,
+      "joint_position_bounds_enforced": true,
+      "limitations": [
+        "Single successful MuJoCo replay; measured peak 145.8 Nm exceeds the original short finishing-step candidate at 130.7 Nm."
+      ]
+    },
+    {
+      "file": "step_up_30kg_centered_step30cm_order0321_then1032_20261026.mat",
+      "status": "earlier_right_front_followup_comparison",
+      "source_workspace_path": "src/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_order0321_then1032_20261026.mat",
+      "sha256": "2b5a55ffef25c9f8c25fac46883ca7b9dc571979a88d2fa5ea97e8095360724d",
+      "payload_position_m": [
+        0.0,
+        0.0,
+        0.2
+      ],
+      "step_height_m": 0.3,
+      "foot_clearance_m": 0.1,
+      "duration_s": 15.08,
+      "optimization": {
+        "generator": "original kyon_codesign fr_devel lower_body/_step_up.py",
+        "git_revision": "60f41ca315b86f9a47faca3f2654c63aebdbd361",
+        "optimizer_workspace_path": "artifacts/original_step_up/candidate_sources/step_up_30kg_centered_step30cm_order0321_then1032_20261026.py",
+        "optimizer_sha256": "f8b33169f4ad378352d863df1d9320797246ea3aef0bd43f018c5bfb57d7c0bb",
+        "solver_status": "Solve_Succeeded",
+        "iterations": 39,
+        "max_iterations": 500,
+        "linear_solver": "ma57",
+        "planned_peak_joint_torque_nm": 131.2102790261894,
+        "urdf_workspace_path": "artifacts/original_step_up/robot.urdf",
+        "urdf_sha256": "7ed0fb7fdbc2383b3d88c67b3c6eb5036ef37904d145f2ba97d61e544d088143",
+        "result_workspace_path": "artifacts/robot_deployment/centered_order0321_1032_front_advance_30kg_trial1/optimization_result.json",
+        "initial_guess": "q only from accepted full-length centred candidate",
+        "initial_guess_candidate_file": "step_up_30kg_centered_step30cm_clearance10cm_20261026.mat",
+        "initial_guess_mat_sha256": "5d763ff5cff75c1953b265d36d856c9f1fb6eaa64bcaa47d878e291fa1381ec5",
+        "initial_guess_workspace_path": "artifacts/robot_deployment/centered_order0321_1032_front_advance_30kg_trial1/initial_guess.mat",
+        "initial_guess_note": "Leg position seeds remapped to each new swing schedule; body and endpoints preserved."
+      },
+      "simulation": {
+        "successful_climbs": 1,
+        "trials": 1,
+        "measured_peak_joint_torque_nm": 146.40126037597656,
+        "peak_joint_error_deg": 4.526129013893792,
+        "final_base_error_m": 0.06627975516281137,
+        "physical_effort_limit_nm": 185.0,
+        "applied_effort_limit_nm": 185.0,
+        "artificial_cap": false,
+        "feedforward": true,
+        "stiffness_nm_rad": 2000.0,
+        "damping_nm_s_rad": 120.0,
+        "rate_hz": 500.0,
+        "result_workspace_path": "artifacts/robot_deployment/centered_order0321_1032_front_advance_30kg_trial1/result.json",
+        "final_hold_seconds_recorded": 4.372593360096216,
+        "right_front_hip_pitch_max_upper_stance_deg": 73.0495288714467
+      },
+      "foot_swings": 12,
+      "cycle_orders": [
+        [
+          0,
+          3,
+          2,
+          1
+        ],
+        [
+          1,
+          0,
+          3,
+          2
+        ],
+        [
+          1,
+          0,
+          3,
+          2
+        ]
+      ],
+      "joint_position_bounds_enforced": true,
+      "limitations": [
+        "Single successful MuJoCo replay; measured peak 146.4 Nm exceeds original short candidate at 130.7 Nm.",
+        "Right-front hip pitch reduced to 73 degrees during upper-step stance; still differs substantially from 40 degree homing."
+      ]
+    },
+    {
+      "file": "step_up_30kg_centered_step30cm_front_right_finish_rf_forward10cm_20261026.mat",
+      "status": "right_front_forward_footholds_comparison",
+      "source_workspace_path": "src/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_front_right_finish_rf_forward10cm_20261026.mat",
+      "sha256": "a7171eba71042b42ffaa6cfe7144b534216d7a3516695dc5ddf883bb482ed587",
+      "payload_position_m": [
+        0.0,
+        0.0,
+        0.2
+      ],
+      "step_height_m": 0.3,
+      "foot_clearance_m": 0.1,
+      "duration_s": 15.08,
+      "optimization": {
+        "generator": "original kyon_codesign fr_devel lower_body/_step_up.py",
+        "git_revision": "60f41ca315b86f9a47faca3f2654c63aebdbd361",
+        "optimizer_workspace_path": "artifacts/original_step_up/candidate_sources/step_up_30kg_centered_step30cm_front_right_finish_rf_forward10cm_20261026.py",
+        "optimizer_sha256": "9b7586392ce7b0565bbca5e45195b3169233633dbe3dc34324ca34b25fa15126",
+        "solver_status": "Solve_Succeeded",
+        "iterations": 66,
+        "max_iterations": 500,
+        "linear_solver": "ma57",
+        "planned_peak_joint_torque_nm": 117.67276414502331,
+        "urdf_workspace_path": "artifacts/original_step_up/robot.urdf",
+        "urdf_sha256": "7ed0fb7fdbc2383b3d88c67b3c6eb5036ef37904d145f2ba97d61e544d088143",
+        "result_workspace_path": "artifacts/robot_deployment/centered_order0321_front_finish_rf_forward10cm_30kg_trial1/optimization_result.json",
+        "initial_guess": "q only from accepted full-length centred candidate",
+        "initial_guess_candidate_file": "step_up_30kg_centered_step30cm_clearance10cm_20261026.mat",
+        "initial_guess_mat_sha256": "5d763ff5cff75c1953b265d36d856c9f1fb6eaa64bcaa47d878e291fa1381ec5",
+        "initial_guess_note": "Position seed from the accepted original short finishing-step candidate; original costs and gait preserved."
+      },
+      "simulation": {
+        "successful_climbs": 1,
+        "trials": 1,
+        "measured_peak_joint_torque_nm": 134.78126525878906,
+        "peak_joint_error_deg": 3.8315158507764204,
+        "final_base_error_m": 0.02463146939764175,
+        "physical_effort_limit_nm": 185.0,
+        "applied_effort_limit_nm": 185.0,
+        "artificial_cap": false,
+        "feedforward": true,
+        "stiffness_nm_rad": 2000.0,
+        "damping_nm_s_rad": 120.0,
+        "rate_hz": 500.0,
+        "result_workspace_path": "artifacts/robot_deployment/centered_order0321_front_finish_rf_forward10cm_30kg_trial1/result.json",
+        "final_hold_seconds_recorded": 4.3664920971076935,
+        "right_front_hip_pitch_max_upper_stance_deg": 81.50323351660397
+      },
+      "foot_swings": 12,
+      "joint_position_bounds_enforced": true,
+      "right_front_landing_forward_offsets_m": [
+        0.1,
+        0.1,
+        0.0
+      ],
+      "right_front_landing_x_m": [
+        0.8181466663066088,
+        1.1681466663066087,
+        1.4181466663066087
+      ],
+      "limitations": [
+        "Single successful MuJoCo replay; measured peak 134.8 Nm exceeds original short candidate at 130.7 Nm.",
+        "Right-front hip pitch still reaches 81.5 degrees during upper-step stance; the reported posture concern remains unresolved."
       ]
     }
   ]

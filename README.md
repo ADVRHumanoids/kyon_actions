@@ -19,6 +19,9 @@ selection in [docker/README.md](docker/README.md) for both homing and replay.
 The latest full motion lasts 20.28 s; a 15.08 s front-right-finish option is
 also available. All use 12 leg joints, no arms, a 30 cm step and 10 cm clearance.
 The centred payload mount is `[0, 0, 0.20]` m relative to the pelvis.
+The collection also includes the COM-margin, body-tracking, force-smoothing,
+longer-support, mixed-order and forward-foothold comparisons. Their table lists
+measured peaks and tracking errors; right-front stance posture remains unresolved.
 
 The command's unchanged default, `step_up_30kg_optimized_v2.mat`, uses the older
 rear payload mount `[-0.20, 0, 0.20]` m. Select centred motions with `-f`.
