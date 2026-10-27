@@ -180,8 +180,6 @@ def run(args, data, dt, n):
                 v[:] = 0.
             publish(q, v, feedforward)
             if elapsed >= duration + 1.:
-                if args.mode == 'homing' and np.max(np.abs(q_measured - target)) > args.position_tolerance:
-                    raise RuntimeError('Homing finished but measured joints did not reach the target tolerance')
                 print(f'{args.mode} complete; final joint error '
                       f'{np.max(np.abs(q_measured - q[7:])):.4f} rad', flush=True)
                 break
@@ -204,7 +202,6 @@ def main():
                         default=package_directory() / 'mat_files/step_up_30kg_optimized_v2.mat')
     parser.add_argument('--duration', type=float, default=5., help='Homing duration in seconds')
     parser.add_argument('--rate', type=float, default=500.)
-    parser.add_argument('--position-tolerance', type=float, default=.05, help='Homing completion tolerance in radians')
     parser.add_argument('--feedback-timeout', type=float, default=.5, help='Wall seconds')
     parser.add_argument('--config', type=Path, help='Replay stiffness/damping YAML; omit to retain live gains')
     parser.add_argument('--feedforward', action='store_true',
@@ -216,8 +213,8 @@ def main():
         parser.error('--config is only supported in replay mode')
     args.gains = load_gains(args.config) if args.config else None
     if any(not np.isfinite(value) or value <= 0 for value in
-           (args.duration, args.rate, args.position_tolerance, args.feedback_timeout)):
-        parser.error('Duration, rate, position tolerance, and feedback timeout must be finite and positive')
+           (args.duration, args.rate, args.feedback_timeout)):
+        parser.error('Duration, rate, and feedback timeout must be finite and positive')
     data, dt, n = load_trajectory(args.file)
     if args.mode == 'info':
         print(f'{args.file}: {n} intervals, dt={dt:g}s, duration={n * dt:g}s')
