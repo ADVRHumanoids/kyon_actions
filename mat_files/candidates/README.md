@@ -14,6 +14,7 @@ use `"$MAT"` for both homing and replay.
 
 | Motion | Duration | Predicted peak | Measured peak | Peak joint error | Set MAT |
 | --- | ---: | ---: | ---: | ---: | --- |
+| [Full 0321, COM margin](step_up_centered30_order0321_support_margin2cm_short_trial1.mat) | ?? s | 111.4 Nm | 185 Nm | 21.4° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_centered30_order0321_support_margin2cm_short_trial1.mat"` |
 | [Full 0321, fixed lateral landings](step_up_30kg_centered_step30cm_order0321_landing_y_no_torque_cost_20261026.mat) | 20.28 s | 111.4 Nm | 136.6 Nm | 4.3° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_order0321_landing_y_no_torque_cost_20261026.mat"` |
 | [Full 0321, COM margin 1 cm](step_up_30kg_centered_step30cm_order0321_com_margin1cm_20261026.mat) | 20.28 s | 116.0 Nm | 142.2 Nm | 5.7° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_order0321_com_margin1cm_20261026.mat"` |
 | [Full 0321, joint limits](step_up_30kg_centered_step30cm_order0321_jointlimits_no_torque_cost_20261026.mat) | 20.28 s | 111.4 Nm | 135.9 Nm | 3.2° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_order0321_jointlimits_no_torque_cost_20261026.mat"` |
