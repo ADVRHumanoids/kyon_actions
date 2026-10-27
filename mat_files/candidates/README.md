@@ -9,26 +9,29 @@ homing and replay. All tests used feedforward, 500 Hz, K=2000 Nm/rad,
 D=120 Nm*s/rad and normal 185 Nm effort limits, with no experimental torque cap.
 These gains are the simulation profile, not hardware-validated gains.
 
-| Motion | Duration | Predicted peak | Measured peak | Peak joint error |
-| --- | ---: | ---: | ---: | ---: |
-| [Full 0321, fixed lateral landings](step_up_30kg_centered_step30cm_order0321_landing_y_no_torque_cost_20261026.mat) | 20.28 s | 111.4 Nm | 136.6 Nm | 4.3° |
-| [Full 0321, COM margin 1 cm](step_up_30kg_centered_step30cm_order0321_com_margin1cm_20261026.mat) | 20.28 s | 116.0 Nm | 142.2 Nm | 5.7° |
-| [Full 0321, joint limits](step_up_30kg_centered_step30cm_order0321_jointlimits_no_torque_cost_20261026.mat) | 20.28 s | 111.4 Nm | 135.9 Nm | 3.2° |
-| [Original full 0321](step_up_30kg_centered_step30cm_clearance10cm_20261026.mat) | 20.28 s | 111.4 Nm | 131.2 Nm | 4.0° |
-| [Front-right finishing step, 0321](step_up_30kg_centered_step30cm_front_right_finish_20261026.mat) | 15.08 s | 117.8 Nm | 130.7 Nm | 4.3° |
-| [Front-right finish, body tracking + torque cost](step_up_30kg_centered_step30cm_front_right_finish_bodytrack_tau001_20261026.mat) | 15.08 s | 115.6 Nm | 163.1 Nm | 5.0° |
-| [Front-right finish, force smoothing](step_up_30kg_centered_step30cm_front_right_finish_force_smooth003_20261026.mat) | 15.08 s | 116.5 Nm | 154.3 Nm | 10.5° |
-| [Front-right finish, 0.6 s support](step_up_30kg_centered_step30cm_front_right_finish_stance600ms_20261026.mat) | 17.28 s | 120.9 Nm | 145.8 Nm | 3.0° |
-| [0321 then 1032, earlier right-front steps](step_up_30kg_centered_step30cm_order0321_then1032_20261026.mat) | 15.08 s | 131.2 Nm | 146.4 Nm | 4.5° |
-| [0321 / 0123 / 1032, front-first follow-up cycles](step_up_30kg_centered_step30cm_order0321_0123_1032_20261027.mat) | 15.08 s | 133.3 Nm | 139.3 Nm | 6.0° |
-| [0321 / 0123 / 1032, centred finish](step_up_30kg_centered_step30cm_order0321_0123_1032_final_y0_20261027.mat) | 15.08 s | 130.0 Nm | 150.2 Nm | 3.7° |
-| [0321 / 0123 / 1032, centred finish and heading](step_up_30kg_centered_step30cm_order0321_0123_1032_final_y0_yaw0_20261027.mat) | 15.08 s | 125.7 Nm | 142.1 Nm | 3.8° |
-| [Front-right finish, first two RF landings +10 cm](step_up_30kg_centered_step30cm_front_right_finish_rf_forward10cm_20261026.mat) | 15.08 s | 117.7 Nm | 134.8 Nm | 3.8° |
-| [Front-right finish, body height +5 cm](step_up_30kg_centered_step30cm_front_right_finish_body_height5cm_20261027.mat) | 15.08 s | 106.1 Nm | 128.5 Nm | 4.0° |
-| [Stop after climb, 0321](step_up_30kg_centered_step30cm_stop_after_climb_20261026.mat) | 13.88 s | 120.4 Nm | 137.3 Nm | 3.6° |
-| [Short order 2301](step_up_30kg_centered_step30cm_order2301_20261026.mat) | 15.08 s | 105.3 Nm | 148.9 Nm | 3.1° |
-| [Short order 0123](step_up_30kg_centered_step30cm_order0123_20261026.mat) | 15.08 s | 130.9 Nm | 155.7 Nm | 3.2° |
-| [Full order 2301](step_up_30kg_centered_step30cm_order2301_full_20261026.mat) | 20.28 s | 101.6 Nm | 159.0 Nm | 7.3° |
+Inside Docker, copy one complete assignment from the **Set MAT** column, then
+use `"$MAT"` for both homing and replay.
+
+| Motion | Duration | Predicted peak | Measured peak | Peak joint error | Set MAT |
+| --- | ---: | ---: | ---: | ---: | --- |
+| [Full 0321, fixed lateral landings](step_up_30kg_centered_step30cm_order0321_landing_y_no_torque_cost_20261026.mat) | 20.28 s | 111.4 Nm | 136.6 Nm | 4.3° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_order0321_landing_y_no_torque_cost_20261026.mat"` |
+| [Full 0321, COM margin 1 cm](step_up_30kg_centered_step30cm_order0321_com_margin1cm_20261026.mat) | 20.28 s | 116.0 Nm | 142.2 Nm | 5.7° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_order0321_com_margin1cm_20261026.mat"` |
+| [Full 0321, joint limits](step_up_30kg_centered_step30cm_order0321_jointlimits_no_torque_cost_20261026.mat) | 20.28 s | 111.4 Nm | 135.9 Nm | 3.2° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_order0321_jointlimits_no_torque_cost_20261026.mat"` |
+| [Original full 0321](step_up_30kg_centered_step30cm_clearance10cm_20261026.mat) | 20.28 s | 111.4 Nm | 131.2 Nm | 4.0° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_clearance10cm_20261026.mat"` |
+| [Front-right finishing step, 0321](step_up_30kg_centered_step30cm_front_right_finish_20261026.mat) | 15.08 s | 117.8 Nm | 130.7 Nm | 4.3° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_front_right_finish_20261026.mat"` |
+| [Front-right finish, body tracking + torque cost](step_up_30kg_centered_step30cm_front_right_finish_bodytrack_tau001_20261026.mat) | 15.08 s | 115.6 Nm | 163.1 Nm | 5.0° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_front_right_finish_bodytrack_tau001_20261026.mat"` |
+| [Front-right finish, force smoothing](step_up_30kg_centered_step30cm_front_right_finish_force_smooth003_20261026.mat) | 15.08 s | 116.5 Nm | 154.3 Nm | 10.5° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_front_right_finish_force_smooth003_20261026.mat"` |
+| [Front-right finish, 0.6 s support](step_up_30kg_centered_step30cm_front_right_finish_stance600ms_20261026.mat) | 17.28 s | 120.9 Nm | 145.8 Nm | 3.0° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_front_right_finish_stance600ms_20261026.mat"` |
+| [0321 then 1032, earlier right-front steps](step_up_30kg_centered_step30cm_order0321_then1032_20261026.mat) | 15.08 s | 131.2 Nm | 146.4 Nm | 4.5° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_order0321_then1032_20261026.mat"` |
+| [0321 / 0123 / 1032, front-first follow-up cycles](step_up_30kg_centered_step30cm_order0321_0123_1032_20261027.mat) | 15.08 s | 133.3 Nm | 139.3 Nm | 6.0° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_order0321_0123_1032_20261027.mat"` |
+| [0321 / 0123 / 1032, centred finish](step_up_30kg_centered_step30cm_order0321_0123_1032_final_y0_20261027.mat) | 15.08 s | 130.0 Nm | 150.2 Nm | 3.7° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_order0321_0123_1032_final_y0_20261027.mat"` |
+| [0321 / 0123 / 1032, centred finish and heading](step_up_30kg_centered_step30cm_order0321_0123_1032_final_y0_yaw0_20261027.mat) | 15.08 s | 125.7 Nm | 142.1 Nm | 3.8° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_order0321_0123_1032_final_y0_yaw0_20261027.mat"` |
+| [Front-right finish, first two RF landings +10 cm](step_up_30kg_centered_step30cm_front_right_finish_rf_forward10cm_20261026.mat) | 15.08 s | 117.7 Nm | 134.8 Nm | 3.8° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_front_right_finish_rf_forward10cm_20261026.mat"` |
+| [Front-right finish, body height +5 cm](step_up_30kg_centered_step30cm_front_right_finish_body_height5cm_20261027.mat) | 15.08 s | 106.1 Nm | 128.5 Nm | 4.0° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_front_right_finish_body_height5cm_20261027.mat"` |
+| [Stop after climb, 0321](step_up_30kg_centered_step30cm_stop_after_climb_20261026.mat) | 13.88 s | 120.4 Nm | 137.3 Nm | 3.6° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_stop_after_climb_20261026.mat"` |
+| [Short order 2301](step_up_30kg_centered_step30cm_order2301_20261026.mat) | 15.08 s | 105.3 Nm | 148.9 Nm | 3.1° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_order2301_20261026.mat"` |
+| [Short order 0123](step_up_30kg_centered_step30cm_order0123_20261026.mat) | 15.08 s | 130.9 Nm | 155.7 Nm | 3.2° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_order0123_20261026.mat"` |
+| [Full order 2301](step_up_30kg_centered_step30cm_order2301_full_20261026.mat) | 20.28 s | 101.6 Nm | 159.0 Nm | 7.3° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_order2301_full_20261026.mat"` |
 
 The fixed-lateral-landing baseline preserves all 16 lateral landing positions from the
 original successful motion and enforces URDF joint-position bounds. It converged
@@ -89,9 +92,9 @@ Already present in `mat_files/`; no duplicate copies are needed. These used
 `[-0.20, 0, 0.20]` m payload mounting and an experimental **115 Nm applied-torque
 cap**. Their results do not establish performance with the centred payload:
 
-- [optimized_v2](../step_up_30kg_optimized_v2.mat): 1 climb; nonconverged feasible checkpoint.
-- [optimized_seed](../step_up_30kg_optimized_seed.mat): 1 climb; nonconverged checkpoint.
-- [candidate_v1](../step_up_30kg_candidate_v1.mat): 3 climbs, no feedforward; manually corrected, reference-clearance check fails.
+- [optimized_v2](../step_up_30kg_optimized_v2.mat) — `MAT="/workspace/kyon_actions/mat_files/step_up_30kg_optimized_v2.mat"`: 1 climb; nonconverged feasible checkpoint.
+- [optimized_seed](../step_up_30kg_optimized_seed.mat) — `MAT="/workspace/kyon_actions/mat_files/step_up_30kg_optimized_seed.mat"`: 1 climb; nonconverged checkpoint.
+- [candidate_v1](../step_up_30kg_candidate_v1.mat) — `MAT="/workspace/kyon_actions/mat_files/step_up_30kg_candidate_v1.mat"`: 3 climbs, no feedforward; manually corrected, reference-clearance check fails.
 
 [candidates.json](candidates.json) records hashes, solver status, model and replay
 conditions. Its workspace-local evidence paths are provenance only; logs, graphs,
