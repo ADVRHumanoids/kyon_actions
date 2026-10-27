@@ -13,15 +13,16 @@ and gain-file edits take effect on the next run without rebuilding.
 
 ## Selected motion
 
-The [candidate collection](mat_files/candidates/README.md) contains the successful
-centred 30 kg trajectories and their MuJoCo results. Use the explicit `MAT`
-selection in [docker/README.md](docker/README.md) for both homing and replay.
-The latest full motion lasts 20.28 s; a 15.08 s front-right-finish option is
-also available. All use 12 leg joints, no arms, a 30 cm step and 10 cm clearance.
-The centred payload mount is `[0, 0, 0.20]` m relative to the pelvis.
-The collection also includes the COM-margin, body-tracking, force-smoothing,
-longer-support, mixed-order and forward-foothold comparisons. Their table lists
-measured peaks and tracking errors; right-front stance posture remains unresolved.
+The [candidate collection](mat_files/candidates/README.md) has separate tables
+for the current successful 15.08 s motions **without arms** and **with arms fixed
+backward**. Copy a `MAT=` assignment from the appropriate table and use it for
+both homing and replay with [the Docker commands](docker/README.md).
+Older comparisons are in a collapsed section.
+
+Both use 12 leg references, a centred 30 kg payload at `[0, 0, 0.20]` m relative
+to the pelvis, a 30 cm step and 10 cm clearance. The fixed-arm version includes
+the arms' mass and requires its matching posture and model; the replayer does
+not position the arms.
 
 The command's unchanged default, `step_up_30kg_optimized_v2.mat`, uses the older
 rear payload mount `[-0.20, 0, 0.20]` m. Select centred motions with `-f`.

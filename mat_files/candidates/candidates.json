@@ -2,7 +2,6 @@
   "description": "Preserved MuJoCo climb candidates; solver convergence and simulation success are recorded separately.",
   "catalogued_on": "2026-10-27",
   "payload_kg": 30.0,
-  "arms": false,
   "hardware_tested": false,
   "default_replay_changed": false,
   "workspace_paths_note": "Evidence paths are relative to the development workspace and are not packaged runtime dependencies.",
@@ -1199,6 +1198,209 @@
       "torque_cost_enabled": false,
       "terminal_body_lateral_position_matches_initial": true,
       "terminal_body_yaw_matches_initial": true
+    },
+    {
+      "file": "step_up_centered30_order0321_support_margin2cm_short_trial1.mat",
+      "status": "short_order0321_support_margin2cm_comparison",
+      "source_workspace_path": "src/kyon_actions/mat_files/candidates/step_up_centered30_order0321_support_margin2cm_short_trial1.mat",
+      "sha256": "a8c69bf18e613c6b9b48c9ff3351d178322c5bf0e8f65b37c193434844d9cbd7",
+      "payload_position_m": [
+        0.0,
+        0.0,
+        0.2
+      ],
+      "step_height_m": 0.3,
+      "foot_clearance_m": 0.1,
+      "duration_s": 15.08,
+      "foot_swings": 12,
+      "cycle_orders": [
+        [
+          0,
+          3,
+          2,
+          1
+        ],
+        [
+          0,
+          3,
+          2,
+          1
+        ],
+        [
+          0,
+          3,
+          2,
+          1
+        ]
+      ],
+      "joint_position_bounds_enforced": true,
+      "torque_cost_enabled": false,
+      "support_margin_m": 0.02,
+      "optimization": {
+        "generator": "original kyon_codesign fr_devel lower_body/_step_up.py",
+        "git_revision": "60f41ca315b86f9a47faca3f2654c63aebdbd361",
+        "optimizer_workspace_path": "artifacts/original_step_up/candidate_sources/step_up_centered30_order0321_support_margin2cm_short_trial1.py",
+        "optimizer_sha256": "a1cbd4614221c364a28781f3d79a4fa560a0291f09ec85c5f09120da7d9e4046",
+        "solver_status": "Solve_Succeeded",
+        "iterations": 52,
+        "max_iterations": 500,
+        "linear_solver": "ma57",
+        "planned_peak_joint_torque_nm": 119.17363163584695,
+        "urdf_workspace_path": "artifacts/original_step_up/robot.urdf",
+        "urdf_sha256": "7ed0fb7fdbc2383b3d88c67b3c6eb5036ef37904d145f2ba97d61e544d088143",
+        "initial_guess": "q, v, a and contact forces from the original full centred 0321 candidate, truncated to the shorter horizon",
+        "initial_guess_candidate_file": "step_up_30kg_centered_step30cm_clearance10cm_20261026.mat",
+        "initial_guess_mat_sha256": "5d763ff5cff75c1953b265d36d856c9f1fb6eaa64bcaa47d878e291fa1381ec5",
+        "support_margin_nodes": 252,
+        "support_margin_scope": "All 12 swings and each immediately preceding node",
+        "result_workspace_path": "artifacts/original_step_up/centered30_order0321_support_margin2cm_short_trial1/support_audit.json",
+        "planned_500hz_minimum_margin_m": 0.00746507820946005
+      },
+      "simulation": {
+        "successful_climbs": 1,
+        "trials": 1,
+        "measured_peak_joint_torque_nm": 185.0,
+        "peak_joint_error_deg": 21.407834594814286,
+        "final_base_error_m": 0.05240642263444688,
+        "physical_effort_limit_nm": 185.0,
+        "applied_effort_limit_nm": 185.0,
+        "artificial_cap": false,
+        "feedforward": true,
+        "stiffness_nm_rad": 2000.0,
+        "damping_nm_s_rad": 120.0,
+        "rate_hz": 500.0,
+        "result_workspace_path": "artifacts/robot_deployment/original0321_support_margin2cm_short_30kg_trial1/result.json",
+        "support_audit_workspace_path": "artifacts/robot_deployment/original0321_support_margin2cm_short_30kg_trial1/support_replay_audit.json",
+        "measured_minimum_scheduled_support_margin_m": -0.00510012197787267,
+        "tracking_limits_satisfied": false,
+        "final_hold_seconds_recorded": 4.360469030989334
+      },
+      "limitations": [
+        "Completed the recorded MuJoCo climb and final hold; hardware validation is not established by this record.",
+        "2 cm margin is enforced at optimization nodes; interpolated reference minimum is 0.75 cm.",
+        "Measured projected COM briefly goes 5 mm outside the triangle inferred from the planned contact schedule.",
+        "Measured torque reaches the normal 185 Nm effort limit and peak tracking error is 21.4 degrees; the tracking bound fails."
+      ]
+    },
+    {
+      "file": "step_up_centered30_order0321_support_margin2cm_short_fixed_arms_back_trial1.mat",
+      "status": "short_order0321_support_margin2cm_fixed_backward_arms",
+      "source_workspace_path": "src/kyon_actions/mat_files/candidates/step_up_centered30_order0321_support_margin2cm_short_fixed_arms_back_trial1.mat",
+      "sha256": "bb751add10548305a6cf13e5af5a98b5b1f4bde4e8e583f4643231338dcfa9e8",
+      "payload_position_m": [
+        0.0,
+        0.0,
+        0.2
+      ],
+      "step_height_m": 0.3,
+      "foot_clearance_m": 0.1,
+      "duration_s": 15.08,
+      "foot_swings": 12,
+      "cycle_orders": [
+        [
+          0,
+          3,
+          2,
+          1
+        ],
+        [
+          0,
+          3,
+          2,
+          1
+        ],
+        [
+          0,
+          3,
+          2,
+          1
+        ]
+      ],
+      "joint_position_bounds_enforced": true,
+      "torque_cost_enabled": false,
+      "support_margin_m": 0.02,
+      "optimization": {
+        "generator": "original kyon_codesign fr_devel lower_body/_step_up.py",
+        "git_revision": "60f41ca315b86f9a47faca3f2654c63aebdbd361",
+        "optimizer_workspace_path": "artifacts/original_step_up/candidate_sources/step_up_centered30_order0321_support_margin2cm_short_fixed_arms_back_trial1.py",
+        "optimizer_sha256": "4c1d34e24375582bdbce24c9a9dceec58e700fe3c30a54a915ac2fc58cc88f05",
+        "solver_status": "Solve_Succeeded",
+        "iterations": 316,
+        "max_iterations": 500,
+        "linear_solver": "ma57",
+        "planned_peak_joint_torque_nm": 134.2479039835829,
+        "urdf_workspace_path": "artifacts/original_step_up/candidate_sources/step_up_centered30_order0321_support_margin2cm_short_fixed_arms_back_trial1.urdf",
+        "urdf_sha256": "aa76761feae49708bbdda3845b769256babc96dcab2177b931d294649c2062c7",
+        "initial_guess": "q, v, a and contact forces from the accepted short 0321, 2 cm support-margin candidate",
+        "initial_guess_candidate_file": "step_up_centered30_order0321_support_margin2cm_short_trial1.mat",
+        "initial_guess_mat_sha256": "a8c69bf18e613c6b9b48c9ff3351d178322c5bf0e8f65b37c193434844d9cbd7",
+        "support_margin_nodes": 252,
+        "support_margin_scope": "All 12 swings and each immediately preceding node",
+        "result_workspace_path": "artifacts/original_step_up/centered30_order0321_support_margin2cm_short_fixed_arms_back_trial1/support_audit.json",
+        "planned_500hz_minimum_margin_m": 0.007641383564946206
+      },
+      "simulation": {
+        "successful_climbs": 2,
+        "trials": 2,
+        "measured_peak_joint_torque_nm": 185.0,
+        "peak_joint_error_deg": 7.873159056273698,
+        "final_base_error_m": 0.03252028699642184,
+        "physical_effort_limit_nm": 185.0,
+        "applied_effort_limit_nm": 185.0,
+        "artificial_cap": false,
+        "feedforward": true,
+        "stiffness_nm_rad": 2000.0,
+        "damping_nm_s_rad": 120.0,
+        "rate_hz": 500.0,
+        "result_workspace_path": "artifacts/robot_deployment/original0321_support_margin2cm_short_fixed_arms_back_30kg_trial2/result.json",
+        "support_audit_workspace_path": "artifacts/robot_deployment/original0321_support_margin2cm_short_fixed_arms_back_30kg_trial1/support_replay_audit.json",
+        "measured_minimum_scheduled_support_margin_m": 0.01173345060491873,
+        "tracking_limits_satisfied": true,
+        "final_hold_seconds_recorded": 4.37917932712473,
+        "recorded_trials": [
+          {
+            "result_workspace_path": "artifacts/robot_deployment/original0321_support_margin2cm_short_fixed_arms_back_30kg_trial1/result.json",
+            "measured_peak_joint_torque_nm": 185.0,
+            "peak_joint_error_deg": 7.873159056273698,
+            "final_base_error_m": 0.02964841921561626,
+            "final_hold_seconds_recorded": 4.37917932712473,
+            "tracking_limits_satisfied": true
+          },
+          {
+            "result_workspace_path": "artifacts/robot_deployment/original0321_support_margin2cm_short_fixed_arms_back_30kg_trial2/result.json",
+            "measured_peak_joint_torque_nm": 185.0,
+            "peak_joint_error_deg": 7.191635950700656,
+            "final_base_error_m": 0.03252028699642184,
+            "final_hold_seconds_recorded": 4.456219957051799,
+            "tracking_limits_satisfied": true
+          }
+        ],
+        "summary_note": "Peak effort, tracking error and final base error are the worst of two replays. The support-margin audit covers the first replay only."
+      },
+      "limitations": [
+        "Two successful MuJoCo climbs and final holds; physical robot replay remains unvalidated.",
+        "Arms and grippers are rigidly fixed backward in the model; arm servo tracking and holding are not tested.",
+        "The MAT commands 12 leg joints only and requires the matching fixed-arm mass model and posture; it does not position the arms.",
+        "2 cm margin is enforced at optimization nodes; interpolated reference minimum is 0.76 cm.",
+        "Measured peak torque reaches the normal 185 Nm physical limit in both replays."
+      ],
+      "arms": true,
+      "fixed_arm_joints_rad": {
+        "shoulder_yaw_1": 0.0,
+        "shoulder_pitch_1": 1.5707963267948966,
+        "elbow_pitch_1": 0.0,
+        "wrist_pitch_1": 0.0,
+        "wrist_yaw_1": 0.0,
+        "dagana_1_clamp_joint": 0.0,
+        "shoulder_yaw_2": 0.0,
+        "shoulder_pitch_2": -1.5707963267948966,
+        "elbow_pitch_2": 0.0,
+        "wrist_pitch_2": 0.0,
+        "wrist_yaw_2": 0.0,
+        "dagana_2_clamp_joint": 0.0
+      },
+      "robot_mass_kg": 111.87548794
     }
-  ]
+  ],
+  "default_arms": false
 }

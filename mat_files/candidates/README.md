@@ -1,20 +1,101 @@
 # Step-up candidates
 
-All centred candidates below completed one recorded MuJoCo climb with a
-30 kg payload at `[0, 0, 0.20]` m relative to the pelvis, 12 leg joints, no arms,
-a 30 cm step and 10 cm clearance. **Physical robot replay remains unvalidated.**
+Current successful motions use a centred 30 kg payload at `[0, 0, 0.20]` m
+relative to the pelvis, a 30 cm step and 10 cm clearance. Success here means
+completing the recorded MuJoCo climb and final hold. **Hardware replay remains
+unvalidated.**
 
-Use [the Docker commands](../../docker/README.md), selecting the same MAT for
-homing and replay. All tests used feedforward, 500 Hz, K=2000 Nm/rad,
-D=120 Nm*s/rad and normal 185 Nm effort limits, with no experimental torque cap.
-These gains are the simulation profile, not hardware-validated gains.
+Follow [the Docker commands](../../docker/README.md). Copy one **Set MAT**
+assignment below and use the same `"$MAT"` for homing and replay.
+Simulation settings: feedforward, 500 Hz, K=2000 Nm/rad, D=120 Nm*s/rad,
+normal 185 Nm effort limits; no experimental torque cap.
 
-Inside Docker, copy one complete assignment from the **Set MAT** column, then
-use `"$MAT"` for both homing and replay.
+## Without arms
 
 | Motion | Duration | Predicted peak | Measured peak | Peak joint error | Set MAT |
 | --- | ---: | ---: | ---: | ---: | --- |
-| [Full 0321, COM margin](step_up_centered30_order0321_support_margin2cm_short_trial1.mat) | ?? s | 111.4 Nm | 185 Nm | 21.4° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_centered30_order0321_support_margin2cm_short_trial1.mat"` |
+| [Short 0321, COM margin 2 cm](step_up_centered30_order0321_support_margin2cm_short_trial1.mat) — **Worked: climb and hold completed** | 15.08 s | 119.2 Nm | 185 Nm | 21.4° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_centered30_order0321_support_margin2cm_short_trial1.mat"` |
+
+Total model mass is **98.65 kg**, including the 30 kg payload. The optimization
+converged in 52 iterations. The last cycle of the full motion is removed;
+the final right-front step aligns the front feet before stopping.
+
+The replay completed the climb, but its 21.4-degree tracking peak exceeds the
+tracking bound and measured COM briefly crosses the planned support edge by 5 mm.
+
+## With arms
+
+| Motion | Duration | Predicted peak | Measured peak | Peak joint error | Set MAT |
+| --- | ---: | ---: | ---: | ---: | --- |
+| [Short 0321, COM margin 2 cm, arms fixed backward](step_up_centered30_order0321_support_margin2cm_short_fixed_arms_back_trial1.mat) — **Worked: 2/2 MuJoCo climbs and holds** | 15.08 s | 134.2 Nm | 185 Nm | 7.9° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_centered30_order0321_support_margin2cm_short_fixed_arms_back_trial1.mat"` |
+
+Arms are **fixed backward**: shoulder pitches +90 degrees left / -90 degrees
+right; elbows, wrists and grippers at zero. The arms add **13.22 kg**, bringing
+total mass to **111.88 kg** including the 30 kg payload. Costs, constraints,
+timing and foot landing targets match the version without arms. The accepted
+short motion supplies the initial guess; the new model is reoptimized rather
+than reusing the old torques. It converged in 316 iterations.
+
+Both recorded MuJoCo climbs completed; tracking peaks were 7.9 and 7.2 degrees
+(the table shows the worst). The first replay's measured COM stayed at least
+1.17 cm inside the triangle inferred from the planned supporting feet.
+
+**Requires the matching fixed-arm model and posture.** The MAT commands only
+the 12 leg joints; it does not position the arms. Arms were rigidly fixed in
+simulation, so arm servo holding has not been validated.
+
+Homing also commands only the legs. The current replayer requires a live URDF
+with only 12 moving leg joints and leg-only joint feedback; XBot exposing moving
+arm joints is rejected at startup. This candidate was tested with the arms fixed
+in the simulation model, not with the full-robot XBot interface.
+
+## Motion specifications and explanation
+
+Both working candidates use these settings:
+
+| Specification | Value |
+| --- | --- |
+| Leg order | `0321`: left-front → right-rear → left-rear → right-front |
+| Actual sequence | Three repetitions of `0321`: 12 swings, one foot at a time |
+| Timing | 1 s initial hold; 0.8 s swings; 0.4 s between swings; 0.08 s after the last swing |
+| End of motion | 15.08 s, after the third right-front landing; planned final velocity is zero |
+| Foot advancement | 35 cm forward per foot swing |
+| Obstacle | 30 cm high; front edge at `x = 0.60 m` in the trajectory frame |
+| Initial obstacle distance | About 23.2 cm ahead of the front-foot contact centres at the MAT's initial posture |
+| Foot clearance setting | 10 cm |
+| MAT sampling | 40 ms between nodes, interpolated by the replayer at 500 Hz |
+
+**Balance constraint.** During a swing, the other three feet form the support
+triangle. The optimizer keeps the horizontal projection of the whole robot's
+centre of mass (COM), including the payload and any fixed arms, at least 2 cm
+inside each edge at the optimization nodes. It also checks the node immediately
+before lift-off, so the body can transfer weight before lifting a foot. Landing
+targets and swing timing stay fixed while the optimizer adjusts body and leg
+posture. URDF joint-position bounds are enforced; no added torque-minimization
+cost is enabled.
+
+The 2 cm bound applies at the 40 ms nodes. The interpolated reference reaches
+smaller margins: **0.75 cm without arms / 0.76 cm with fixed arms**. This is a
+geometric balance measure, not a guarantee against falling on the real robot.
+Neither motion is constrained to finish in an exact homing posture.
+
+**Torque figures.** Predicted peak is the optimizer's inverse-dynamics torque.
+Measured peak is the applied MuJoCo joint effort, including feedforward and
+position/velocity feedback. Both working motions reach the normal **185 Nm**
+limit in simulation; the lower predicted peaks do not establish a lower applied
+torque limit. The replay follows saved leg references and does not correct body
+balance from IMU or contact feedback.
+
+<details>
+<summary>Older comparisons and historical motions</summary>
+
+### Without arms — earlier comparisons
+
+These centred-payload motions completed recorded MuJoCo climbs. Detailed
+optimization changes and limitations are recorded in [candidates.json](candidates.json).
+
+| Motion | Duration | Predicted peak | Measured peak | Peak joint error | Set MAT |
+| --- | ---: | ---: | ---: | ---: | --- |
 | [Full 0321, fixed lateral landings](step_up_30kg_centered_step30cm_order0321_landing_y_no_torque_cost_20261026.mat) | 20.28 s | 111.4 Nm | 136.6 Nm | 4.3° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_order0321_landing_y_no_torque_cost_20261026.mat"` |
 | [Full 0321, COM margin 1 cm](step_up_30kg_centered_step30cm_order0321_com_margin1cm_20261026.mat) | 20.28 s | 116.0 Nm | 142.2 Nm | 5.7° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_order0321_com_margin1cm_20261026.mat"` |
 | [Full 0321, joint limits](step_up_30kg_centered_step30cm_order0321_jointlimits_no_torque_cost_20261026.mat) | 20.28 s | 111.4 Nm | 135.9 Nm | 3.2° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_order0321_jointlimits_no_torque_cost_20261026.mat"` |
@@ -34,60 +115,7 @@ use `"$MAT"` for both homing and replay.
 | [Short order 0123](step_up_30kg_centered_step30cm_order0123_20261026.mat) | 15.08 s | 130.9 Nm | 155.7 Nm | 3.2° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_order0123_20261026.mat"` |
 | [Full order 2301](step_up_30kg_centered_step30cm_order2301_full_20261026.mat) | 20.28 s | 101.6 Nm | 159.0 Nm | 7.3° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_30kg_centered_step30cm_order2301_full_20261026.mat"` |
 
-The fixed-lateral-landing baseline preserves all 16 lateral landing positions from the
-original successful motion and enforces URDF joint-position bounds. It converged
-in 51 iterations **without the added torque cost**. The shorter body-tracking comparison includes a torque cost; it climbed but
-measured a higher peak than the original finishing-step candidate. The finishing-step option has 12 swings and aligns the front
-feet; it does not end in an exact homing posture.
-
-The COM-margin comparison adds a 1 cm support-triangle margin only during the
-last rear-leg climb (13.00–13.76 s), with the torque cost disabled. It converged
-in 35 iterations and climbed, but measured peak torque increased. It is preserved
-as a comparison, not selected as the replay default.
-
-The force-smoothing comparison keeps body tracking and the landing/COM
-constraints, replaces the torque cost with a 0.003 residual on force differences
-between 40 ms nodes, and converged in 32 iterations. It climbed but did not beat
-the original finishing-step candidate.
-
-The 0.6 s support comparison uses the original short generator costs, 0.8 s
-swings and URDF joint-position bounds. Its phase-matched position seed comes
-from the original short candidate; no torque, body-tracking or force-smoothing
-cost is added. It converged in 33 iterations.
-
-The mixed-order comparison uses `0321` for the first cycle, then `1032` for the
-remaining two cycles, with 12 swings and the original costs. It converged in
-39 iterations. Measured right-front hip pitch during upper-step stance peaked
-at 73 degrees; no hip-posture penalty was used.
-
-The `0321 / 0123 / 1032` comparison has 12 swings and the original costs.
-It converged in 57 iterations using the accepted mixed-order motion as a position
-guess, retiming only the middle-cycle legs. Measured right-front hip pitch peaked
-at 73.4 degrees. It also moves right by **19.0 cm in the plan and 21.8 cm in
-MuJoCo**; lateral landing positions remain unconstrained.
-
-The centred-finish variant adds only a final body lateral-position constraint.
-Measured final sideways offset is **1.9 cm**, but peak torque rises to 150.2 Nm
-and it still finishes with **19.7 degrees of yaw**. Measured right-front hip pitch
-peaks at 72.7 degrees; the original costs, swing order and gains are preserved.
-
-The centred-and-heading variant adds only final yaw alignment to the centred
-finish. It converged in 360 iterations; measured final offset was **2.0 cm**,
-final yaw **−1.1 degrees**, and maximum right-front hip pitch **70.4 degrees**.
-
-The forward-foothold comparison moves only the first two right-front landings
-10 cm forward, with matching soft swing references. Its last landing, original
-0321 gait, timing and costs are preserved. It converged in 66 iterations.
-Measured right-front hip pitch still reaches **81.5 degrees**: the reported
-stance-posture concern remains unresolved, despite completing the simulated climb.
-
-The raised-body comparison constrains body height at least 5 cm above the
-original short reference during 5.40–13.76 s. It converged in 264 iterations.
-One replay measured 128.5 Nm; the small difference from 130.7 Nm needs repeat
-trials before claiming an improvement. Right-front hip pitch still reaches
-82.4 degrees, so the stance-posture concern remains unresolved.
-
-## Historical rear-payload files
+### Historical rear-payload files
 
 Already present in `mat_files/`; no duplicate copies are needed. These used
 `[-0.20, 0, 0.20]` m payload mounting and an experimental **115 Nm applied-torque
@@ -97,7 +125,8 @@ cap**. Their results do not establish performance with the centred payload:
 - [optimized_seed](../step_up_30kg_optimized_seed.mat) — `MAT="/workspace/kyon_actions/mat_files/step_up_30kg_optimized_seed.mat"`: 1 climb; nonconverged checkpoint.
 - [candidate_v1](../step_up_30kg_candidate_v1.mat) — `MAT="/workspace/kyon_actions/mat_files/step_up_30kg_candidate_v1.mat"`: 3 climbs, no feedforward; manually corrected, reference-clearance check fails.
 
-[candidates.json](candidates.json) records hashes, solver status, model and replay
-conditions. Its workspace-local evidence paths are provenance only; logs, graphs,
-failed trials and simulator files are not runtime dependencies or shipped here.
-Preserve accepted MATs and give new candidates descriptive, unique filenames.
+</details>
+
+[candidates.json](candidates.json) records file hashes, solver status, model and
+replay conditions. Evidence paths refer to local development artifacts; logs,
+graphs and simulator files are not shipped with the replay image.
