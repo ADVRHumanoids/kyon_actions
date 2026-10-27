@@ -1400,6 +1400,149 @@
         "dagana_2_clamp_joint": 0.0
       },
       "robot_mass_kg": 111.87548794
+    },
+    {
+      "file": "step_up_centered30_order0321_support_margin2cm_short_fixed_arms_load_ramp_trial1.mat",
+      "status": "short_order0321_fixed_backward_arms_gradual_last_rear_loading",
+      "source_workspace_path": "src/kyon_actions/mat_files/candidates/step_up_centered30_order0321_support_margin2cm_short_fixed_arms_load_ramp_trial1.mat",
+      "sha256": "b828f2486b9fe6f56c6be98cc118d7428ec23f9f4e6d81f4407839632ef24a31",
+      "payload_position_m": [
+        0.0,
+        0.0,
+        0.2
+      ],
+      "step_height_m": 0.3,
+      "foot_clearance_m": 0.1,
+      "duration_s": 15.08,
+      "foot_swings": 12,
+      "cycle_orders": [
+        [
+          0,
+          3,
+          2,
+          1
+        ],
+        [
+          0,
+          3,
+          2,
+          1
+        ],
+        [
+          0,
+          3,
+          2,
+          1
+        ]
+      ],
+      "joint_position_bounds_enforced": true,
+      "torque_cost_enabled": false,
+      "support_margin_m": 0.02,
+      "optimization": {
+        "generator": "original kyon_codesign fr_devel lower_body/_step_up.py",
+        "git_revision": "60f41ca315b86f9a47faca3f2654c63aebdbd361",
+        "optimizer_workspace_path": "artifacts/original_step_up/candidate_sources/step_up_centered30_order0321_support_margin2cm_short_fixed_arms_load_ramp_trial1.py",
+        "optimizer_sha256": "6ee0d9bbe1c59a263f49440a3f44566844e880cb3b41a12840da33e91cc47c40",
+        "solver_status": "Solve_Succeeded",
+        "iterations": 59,
+        "max_iterations": 500,
+        "linear_solver": "ma57",
+        "planned_peak_joint_torque_nm": 134.26187764802256,
+        "urdf_workspace_path": "artifacts/original_step_up/candidate_sources/step_up_centered30_order0321_support_margin2cm_short_fixed_arms_back_trial1.urdf",
+        "urdf_sha256": "aa76761feae49708bbdda3845b769256babc96dcab2177b931d294649c2062c7",
+        "initial_guess": "q, v, a and contact forces from the accepted fixed-backward-arms short 0321 candidate",
+        "initial_guess_candidate_file": "step_up_centered30_order0321_support_margin2cm_short_fixed_arms_back_trial1.mat",
+        "initial_guess_mat_sha256": "bb751add10548305a6cf13e5af5a98b5b1f4bde4e8e583f4643231338dcfa9e8",
+        "support_margin_nodes": 252,
+        "support_margin_scope": "All 12 swings and each immediately preceding node",
+        "result_workspace_path": "artifacts/original_step_up/centered30_order0321_support_margin2cm_short_fixed_arms_load_ramp_trial1/support_audit.json",
+        "planned_500hz_minimum_margin_m": 0.007717935262276324,
+        "landing_load_ramp": {
+          "contact": "contact_3",
+          "leg": "left rear",
+          "time_s": [
+            13.8,
+            14.0
+          ],
+          "nodes": [
+            345,
+            346,
+            347,
+            348,
+            349,
+            350
+          ],
+          "force_scale": [
+            0.1,
+            1.0
+          ],
+          "components": "All three contact-force components, relative to the parent reference at each node",
+          "normal_forces_n": [
+            30.4471635320109,
+            85.85274724188477,
+            142.02805545724948,
+            198.98977407797946,
+            256.76656838823493,
+            315.42011770952575
+          ],
+          "maximum_vertical_load_jump_n": 58.653549321290825,
+          "parent_maximum_vertical_load_jump_n": 304.471635320109,
+          "audit_workspace_path": "artifacts/original_step_up/centered30_order0321_support_margin2cm_short_fixed_arms_load_ramp_trial1/load_ramp_audit.json"
+        }
+      },
+      "simulation": {
+        "successful_climbs": 1,
+        "trials": 1,
+        "measured_peak_joint_torque_nm": 179.5988006591797,
+        "peak_joint_error_deg": 6.535323073354131,
+        "final_base_error_m": 0.03027360067416182,
+        "physical_effort_limit_nm": 185.0,
+        "applied_effort_limit_nm": 185.0,
+        "artificial_cap": false,
+        "feedforward": true,
+        "stiffness_nm_rad": 2000.0,
+        "damping_nm_s_rad": 120.0,
+        "rate_hz": 500.0,
+        "result_workspace_path": "artifacts/robot_deployment/original0321_support_margin2cm_short_fixed_arms_load_ramp_30kg_trial1/result.json",
+        "support_audit_workspace_path": "artifacts/robot_deployment/original0321_support_margin2cm_short_fixed_arms_load_ramp_30kg_trial1/support_replay_audit.json",
+        "measured_minimum_scheduled_support_margin_m": 0.01067862615198139,
+        "tracking_limits_satisfied": true,
+        "final_hold_seconds_recorded": 4.436812212998047,
+        "recorded_trials": [
+          {
+            "result_workspace_path": "artifacts/robot_deployment/original0321_support_margin2cm_short_fixed_arms_load_ramp_30kg_trial1/result.json",
+            "measured_peak_joint_torque_nm": 179.5988006591797,
+            "peak_joint_error_deg": 6.535323073354131,
+            "final_base_error_m": 0.03027360067416182,
+            "final_hold_seconds_recorded": 4.436812212998047,
+            "tracking_limits_satisfied": true
+          }
+        ],
+        "summary_note": "One MuJoCo replay; these values do not establish repeatability or effectiveness against the reported real-robot slip."
+      },
+      "limitations": [
+        "One successful MuJoCo climb and final hold; the reported real-robot touchdown slip has not been retested with this MAT.",
+        "The planned contact load is ramped; actual ground-contact forces were not measured in this test.",
+        "Arms and grippers are rigidly fixed backward in simulation; the replayer commands only the legs. Arm holding must be handled separately.",
+        "The 2 cm support margin is enforced at optimization nodes; interpolated reference minimum is 0.77 cm."
+      ],
+      "arms": true,
+      "fixed_arm_joints_rad": {
+        "shoulder_yaw_1": 0.0,
+        "shoulder_pitch_1": 1.5707963267948966,
+        "elbow_pitch_1": 0.0,
+        "wrist_pitch_1": 0.0,
+        "wrist_yaw_1": 0.0,
+        "dagana_1_clamp_joint": 0.0,
+        "shoulder_yaw_2": 0.0,
+        "shoulder_pitch_2": -1.5707963267948966,
+        "elbow_pitch_2": 0.0,
+        "wrist_pitch_2": 0.0,
+        "wrist_yaw_2": 0.0,
+        "dagana_2_clamp_joint": 0.0
+      },
+      "robot_mass_kg": 111.87548794,
+      "parent_candidate_file": "step_up_centered30_order0321_support_margin2cm_short_fixed_arms_back_trial1.mat"
     }
   ],
   "default_arms": false

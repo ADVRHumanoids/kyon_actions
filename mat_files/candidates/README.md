@@ -28,17 +28,28 @@ tracking bound and measured COM briefly crosses the planned support edge by 5 mm
 | Motion | Duration | Predicted peak | Measured peak | Peak joint error | Set MAT |
 | --- | ---: | ---: | ---: | ---: | --- |
 | [Short 0321, COM margin 2 cm, arms fixed backward](step_up_centered30_order0321_support_margin2cm_short_fixed_arms_back_trial1.mat) — **Worked: 2/2 MuJoCo climbs and holds** | 15.08 s | 134.2 Nm | 185 Nm | 7.9° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_centered30_order0321_support_margin2cm_short_fixed_arms_back_trial1.mat"` |
+| [Short 0321, arms fixed backward, gradual rear-foot loading](step_up_centered30_order0321_support_margin2cm_short_fixed_arms_load_ramp_trial1.mat) — **Worked: 1/1 MuJoCo climb and hold** | 15.08 s | 134.3 Nm | 179.6 Nm | 6.5° | `MAT="/workspace/kyon_actions/mat_files/candidates/step_up_centered30_order0321_support_margin2cm_short_fixed_arms_load_ramp_trial1.mat"` |
 
 Arms are **fixed backward**: shoulder pitches +90 degrees left / -90 degrees
 right; elbows, wrists and grippers at zero. The arms add **13.22 kg**, bringing
-total mass to **111.88 kg** including the 30 kg payload. Costs, constraints,
-timing and foot landing targets match the version without arms. The accepted
-short motion supplies the initial guess; the new model is reoptimized rather
-than reusing the old torques. It converged in 316 iterations.
+total mass to **111.88 kg** including the 30 kg payload. The original fixed-arm
+variant keeps the costs, constraints, timing and landing targets of the version
+without arms. It was reoptimized in 316 iterations using the accepted short
+motion as the initial guess.
 
-Both recorded MuJoCo climbs completed; tracking peaks were 7.9 and 7.2 degrees
-(the table shows the worst). The first replay's measured COM stayed at least
-1.17 cm inside the triangle inferred from the planned supporting feet.
+The original fixed-arm variant completed both recorded MuJoCo climbs; tracking
+peaks were 7.9 and 7.2 degrees (the table shows the worst). Its first replay's
+measured COM stayed at least 1.17 cm inside the triangle inferred from the
+planned supporting feet.
+
+The **gradual-loading** variant ramps all three planned contact-force
+components on the last left-rear landing from 10% to full reference load over
+13.80–14.00 s. It keeps landing targets, timing, gains and the COM constraint,
+and uses the original fixed-arm MAT as its initial guess. It converged in
+59 iterations. The maximum planned vertical-load jump fell from 304 to 59 N
+per 40 ms node; one MuJoCo climb measured 179.6 Nm and 6.5-degree peak error.
+**Whether this fixes the immediate backward slip on the real robot remains
+unverified.**
 
 **Requires the matching fixed-arm model and posture.** The MAT commands only
 the 12 leg joints; it does not position the arms. Arms were rigidly fixed in
@@ -51,7 +62,7 @@ with rigid arms in simulation; real arm servo holding remains unvalidated.
 
 ## Motion specifications and explanation
 
-Both working candidates use these settings:
+The three motions above share these settings:
 
 | Specification | Value |
 | --- | --- |
@@ -75,16 +86,17 @@ posture. URDF joint-position bounds are enforced; no added torque-minimization
 cost is enabled.
 
 The 2 cm bound applies at the 40 ms nodes. The interpolated reference reaches
-smaller margins: **0.75 cm without arms / 0.76 cm with fixed arms**. This is a
-geometric balance measure, not a guarantee against falling on the real robot.
-Neither motion is constrained to finish in an exact homing posture.
+smaller margins: **0.75 cm without arms, 0.76 cm with fixed arms, and 0.77 cm
+with gradual loading**. This is a geometric balance measure, not a guarantee
+against falling on the real robot. No exact final homing posture is imposed.
 
 **Torque figures.** Predicted peak is the optimizer's inverse-dynamics torque.
 Measured peak is the applied MuJoCo joint effort, including feedforward and
-position/velocity feedback. Both working motions reach the normal **185 Nm**
-limit in simulation; the lower predicted peaks do not establish a lower applied
-torque limit. The replay follows saved leg references and does not correct body
-balance from IMU or contact feedback.
+position/velocity feedback. The original two candidates reach the normal
+**185 Nm** limit in simulation. The gradual-loading trial measured **179.6 Nm**
+in one replay with the same limit; no lower applied-torque cap was introduced.
+The replay follows saved leg references and does not correct body balance from
+IMU or contact feedback.
 
 <details>
 <summary>Older comparisons and historical motions</summary>
