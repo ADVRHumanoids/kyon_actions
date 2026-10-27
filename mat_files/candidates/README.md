@@ -20,7 +20,11 @@ These gains are the simulation profile, not hardware-validated gains.
 | [Front-right finish, force smoothing](step_up_30kg_centered_step30cm_front_right_finish_force_smooth003_20261026.mat) | 15.08 s | 116.5 Nm | 154.3 Nm | 10.5° |
 | [Front-right finish, 0.6 s support](step_up_30kg_centered_step30cm_front_right_finish_stance600ms_20261026.mat) | 17.28 s | 120.9 Nm | 145.8 Nm | 3.0° |
 | [0321 then 1032, earlier right-front steps](step_up_30kg_centered_step30cm_order0321_then1032_20261026.mat) | 15.08 s | 131.2 Nm | 146.4 Nm | 4.5° |
+| [0321 / 0123 / 1032, front-first follow-up cycles](step_up_30kg_centered_step30cm_order0321_0123_1032_20261027.mat) | 15.08 s | 133.3 Nm | 139.3 Nm | 6.0° |
+| [0321 / 0123 / 1032, centred finish](step_up_30kg_centered_step30cm_order0321_0123_1032_final_y0_20261027.mat) | 15.08 s | 130.0 Nm | 150.2 Nm | 3.7° |
+| [0321 / 0123 / 1032, centred finish and heading](step_up_30kg_centered_step30cm_order0321_0123_1032_final_y0_yaw0_20261027.mat) | 15.08 s | 125.7 Nm | 142.1 Nm | 3.8° |
 | [Front-right finish, first two RF landings +10 cm](step_up_30kg_centered_step30cm_front_right_finish_rf_forward10cm_20261026.mat) | 15.08 s | 117.7 Nm | 134.8 Nm | 3.8° |
+| [Front-right finish, body height +5 cm](step_up_30kg_centered_step30cm_front_right_finish_body_height5cm_20261027.mat) | 15.08 s | 106.1 Nm | 128.5 Nm | 4.0° |
 | [Stop after climb, 0321](step_up_30kg_centered_step30cm_stop_after_climb_20261026.mat) | 13.88 s | 120.4 Nm | 137.3 Nm | 3.6° |
 | [Short order 2301](step_up_30kg_centered_step30cm_order2301_20261026.mat) | 15.08 s | 105.3 Nm | 148.9 Nm | 3.1° |
 | [Short order 0123](step_up_30kg_centered_step30cm_order0123_20261026.mat) | 15.08 s | 130.9 Nm | 155.7 Nm | 3.2° |
@@ -52,11 +56,32 @@ remaining two cycles, with 12 swings and the original costs. It converged in
 39 iterations. Measured right-front hip pitch during upper-step stance peaked
 at 73 degrees; no hip-posture penalty was used.
 
+The `0321 / 0123 / 1032` comparison has 12 swings and the original costs.
+It converged in 57 iterations using the accepted mixed-order motion as a position
+guess, retiming only the middle-cycle legs. Measured right-front hip pitch peaked
+at 73.4 degrees. It also moves right by **19.0 cm in the plan and 21.8 cm in
+MuJoCo**; lateral landing positions remain unconstrained.
+
+The centred-finish variant adds only a final body lateral-position constraint.
+Measured final sideways offset is **1.9 cm**, but peak torque rises to 150.2 Nm
+and it still finishes with **19.7 degrees of yaw**. Measured right-front hip pitch
+peaks at 72.7 degrees; the original costs, swing order and gains are preserved.
+
+The centred-and-heading variant adds only final yaw alignment to the centred
+finish. It converged in 360 iterations; measured final offset was **2.0 cm**,
+final yaw **−1.1 degrees**, and maximum right-front hip pitch **70.4 degrees**.
+
 The forward-foothold comparison moves only the first two right-front landings
 10 cm forward, with matching soft swing references. Its last landing, original
 0321 gait, timing and costs are preserved. It converged in 66 iterations.
 Measured right-front hip pitch still reaches **81.5 degrees**: the reported
 stance-posture concern remains unresolved, despite completing the simulated climb.
+
+The raised-body comparison constrains body height at least 5 cm above the
+original short reference during 5.40–13.76 s. It converged in 264 iterations.
+One replay measured 128.5 Nm; the small difference from 130.7 Nm needs repeat
+trials before claiming an improvement. Right-front hip pitch still reaches
+82.4 degrees, so the stance-posture concern remains unresolved.
 
 ## Historical rear-payload files
 

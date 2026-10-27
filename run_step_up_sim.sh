@@ -2,6 +2,19 @@
 set -euo pipefail
 
 task_script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+task_baseline=false
+task_args=()
+for task_arg in "$@"; do
+    case "$task_arg" in
+        --baseline) task_baseline=true ;;
+        --prepare-only) task_baseline=true; task_args+=("$task_arg") ;;
+        *) task_args+=("$task_arg") ;;
+    esac
+done
+if [[ "$task_baseline" == false && -x "$task_script_dir/experiments/run_measured_step_up.sh" ]]; then
+    exec "$task_script_dir/experiments/run_measured_step_up.sh" "${task_args[@]}"
+fi
+
 task_workspace=$(cd -- "$task_script_dir/../.." && pwd)
 task_container=kyon-step-up-sim
 exec 9>"/tmp/${task_container}-${UID}.lock"
@@ -42,4 +55,4 @@ docker exec -i "${task_tty[@]}" -w /hhcm_ws "$task_container" bash -lc '
     cmake --build /hhcm_ws/build/kyon_actions -j4
     cmake --install /hhcm_ws/build/kyon_actions
     exec ros2 run kyon_actions replay_sim_ros2.py "$@"
-' bash "$@"
+' bash "${task_args[@]}"
