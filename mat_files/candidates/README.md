@@ -44,10 +44,10 @@ Both recorded MuJoCo climbs completed; tracking peaks were 7.9 and 7.2 degrees
 the 12 leg joints; it does not position the arms. Arms were rigidly fixed in
 simulation, so arm servo holding has not been validated.
 
-Homing also commands only the legs. The current replayer requires a live URDF
-with only 12 moving leg joints and leg-only joint feedback; XBot exposing moving
-arm joints is rejected at startup. This candidate was tested with the arms fixed
-in the simulation model, not with the full-robot XBot interface.
+Homing and replay accept arm joints in the live URDF and feedback, but command
+only the legs, including when applying gains or requesting the final hold.
+Set and hold the arms separately at the posture above. This candidate was tested
+with rigid arms in simulation; real arm servo holding remains unvalidated.
 
 ## Motion specifications and explanation
 

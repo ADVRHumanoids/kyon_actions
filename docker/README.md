@@ -44,10 +44,10 @@ ros2 run kyon_actions replayer_ros2.py replay -f "$MAT" --feedforward \
 to preserve the current gains. Homing preserves the current gains. References
 are sent directly to `/xbotcore/command` at 500 Hz. No separate controller launch.
 
-Homing moves only the 12 leg joints to the MAT's initial posture; it sends no
-arm references. The current startup checks require a live URDF with only the
-12 moving leg joints and matching leg-only feedback. A stack exposing moving
-arm joints is rejected at startup; full-robot XBot compatibility is still pending.
+Homing moves only the 12 leg joints to the MAT's initial posture. Homing and
+replay accept a robot with arms, but send no arm positions, velocities, torques
+or gains. The arms retain their existing XBot control. For the fixed-arm MAT,
+set and hold the arms at its documented posture separately.
 
 Use the **same MAT** for homing and replay. Other successful motions are listed
 in [the candidate table](../mat_files/candidates/README.md), with copyable `MAT=`

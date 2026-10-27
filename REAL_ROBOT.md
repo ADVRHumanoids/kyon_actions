@@ -7,7 +7,10 @@ command publisher alongside this replayer.
 ## Setup
 
 - Match `ROS_DOMAIN_ID` to XBotCore; 77 was only the isolated simulation domain.
-- Use the 12 leg joints, no arms and the 30 kg payload setup matching the MAT.
+- Homing and replay command only the 12 leg joints. Arms may be present in the
+  live URDF and feedback; no arm references or gains are sent. Match the arms
+  and 30 kg payload setup to the MAT. For a fixed-arm MAT, position and hold the
+  arms separately at its documented posture before homing and replay.
   Use feedforward only for a matching robot and payload; model signatures and
   payload mass are not checked. Live joint limits are checked.
 - Select the same MAT with `-f "$MAT"` for both homing and replay. Centred

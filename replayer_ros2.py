@@ -50,11 +50,11 @@ def homing_position(start, target, elapsed, duration):
 def validate_model(urdf, data):
     tree = ET.fromstring(urdf)
     moving = [j for j in tree.findall('joint') if j.get('type') != 'fixed']
-    legs = [j for j in moving if j.get('type') == 'revolute']
-    if (len(moving) != 13 or len(legs) != 12
+    legs = [j for j in moving if j.get('name') in JOINTS]
+    if (len(legs) != 12 or any(j.get('type') != 'revolute' for j in legs)
             or sum(j.get('type') == 'floating' for j in moving) != 1
             or {j.get('name') for j in legs} != set(JOINTS)):
-        raise ValueError('Live model must contain only the floating base and 12 leg joints')
+        raise ValueError('Live model must contain the floating base and all 12 revolute leg joints')
     for index, name in enumerate(JOINTS):
         limit = tree.find(f"joint[@name='{name}']/limit")
         lower, upper, speed = [float(limit.get(key)) for key in ('lower', 'upper', 'velocity')]
@@ -156,8 +156,8 @@ def run(args, data, dt, n):
     try:
         wait_for(lambda: state['urdf'] is not None and state['joints'] is not None)
         mass = validate_model(state['urdf'], data)
-        if set(state['joints'].name) != set(JOINTS):
-            raise ValueError('Joint feedback must contain exactly the 12 leg joints')
+        if not set(JOINTS).issubset(state['joints'].name):
+            raise ValueError('Joint feedback must contain all 12 leg joints')
         publisher = node.create_publisher(JointCommand, '/xbotcore/command', 1)
         wait_for(lambda: publisher.get_subscription_count() > 0)
         q_measured, _, _ = measured()
