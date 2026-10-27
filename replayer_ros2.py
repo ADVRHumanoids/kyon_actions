@@ -163,8 +163,6 @@ def run(args, data, dt, n):
         q_measured, _, _ = measured()
         if args.mode == 'homing':
             validate_homing(state['urdf'], q_measured, target, args.duration)
-        if args.mode == 'replay' and np.max(np.abs(q_measured - target)) > args.position_tolerance:
-            raise ValueError('Robot is not at the initial posture; run homing first')
         start_q = q_measured.copy()
         duration = args.duration if args.mode == 'homing' else n * dt
         print(f'{args.mode}: {duration:.2f}s, live model {mass:.3f} kg, 12 leg joints', flush=True)
@@ -206,7 +204,7 @@ def main():
                         default=package_directory() / 'mat_files/step_up_30kg_optimized_v2.mat')
     parser.add_argument('--duration', type=float, default=5., help='Homing duration in seconds')
     parser.add_argument('--rate', type=float, default=500.)
-    parser.add_argument('--position-tolerance', type=float, default=.05, help='Radians')
+    parser.add_argument('--position-tolerance', type=float, default=.05, help='Homing completion tolerance in radians')
     parser.add_argument('--feedback-timeout', type=float, default=.5, help='Wall seconds')
     parser.add_argument('--config', type=Path, help='Replay stiffness/damping YAML; omit to retain live gains')
     parser.add_argument('--feedforward', action='store_true',

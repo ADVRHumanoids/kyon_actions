@@ -17,7 +17,8 @@ command publisher alongside this replayer.
   candidates require payload mount `[0, 0, 0.20]` m relative to the pelvis;
   omitting `-f` uses the older rear-payload default.
 - Homing preserves the live stiffness/damping and moves to the MAT's initial
-  posture over five seconds. Replay requires initial joint error below 0.05 rad.
+  posture over five seconds. Replay starts directly from the MAT without an
+  initial-posture tolerance check.
   The publisher rejects stale feedback; it does not detect competing publishers.
 - `replay --config ...` sets the provided stiffness/damping. Omitting it retains
   the current gains. The included K=2000/D=120 profile was tested in simulation.
